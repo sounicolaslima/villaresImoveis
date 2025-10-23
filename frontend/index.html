@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Villares - Documentos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <script>
+        // VERIFICAÇÃO DE AUTENTICAÇÃO - REDIRECIONA PARA LOGIN SE NÃO ESTIVER AUTENTICADO
+        (function() {
+            const isAuthenticated = localStorage.getItem('isAuthenticated');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (!isAuthenticated || !currentUser) {
+                // Limpar qualquer dado residual
+                localStorage.removeItem('isAuthenticated');
+                localStorage.removeItem('currentUser');
+                // Redirecionar para login
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>🏠 Villares Imóveis</h2>
+            <p id="current-user">Usuário</p>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="#" onclick="showPage('dashboard')" class="active">📊 Dashboard</a></li>
+            <!-- Formulários removidos da sidebar -->
+            <li><a href="#" onclick="logout()" style="color: #dc3545;">🚪 Sair</a></li>
+        </ul>
+
+        <div class="frase-do-dia">
+            <h4>💡 Frase do Dia</h4>
+            <p id="frase-texto">Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard-container">
+            <!-- TÍTULO CENTRALIZADO - REMOVIDO user-info -->
+            <div class="page-header">
+                <h1>📊 Dashboard - Sistema de Documentos</h1>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>Bem-vindo ao Sistema Villares Imóveis!</strong> Selecione um documento para gerar.
+            </div>
+
+            <!-- Cards de Formulários -->
+            <div class="form-cards-section">
+                <h2 class="section-title">📋 Formulários</h2>
+                <div class="row">
+                    <div class="col-4">
+                        <a href="#" onclick="showPage('cadastro-imovel')" class="card-button">
+                            <div class="card-icon">🏠</div>
+                            <div class="card-title">Cadastro de Imóvel</div>
+                            <div class="card-description">Cadastrar novo imóvel no sistema</div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="#" onclick="showPage('contrato-locacao')" class="card-button">
+                            <div class="card-icon">📝</div>
+                            <div class="card-title">Contrato de Locação</div>
+                            <div class="card-description">Gerar contrato de locação</div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="#" onclick="showPage('contrato-administracao')" class="card-button">
+                            <div class="card-icon">📋</div>
+                            <div class="card-title">Contrato Administração</div>
+                            <div class="card-description">Contrato de administração</div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-4">
+                        <a href="#" onclick="showPage('ficha-cadastral')" class="card-button">
+                            <div class="card-icon">📄</div>
+                            <div class="card-title">Ficha Cadastral</div>
+                            <div class="card-description">Ficha cadastral de cliente</div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="#" onclick="showPage('recibo-aluguel')" class="card-button">
+                            <div class="card-icon">💰</div>
+                            <div class="card-title">Recibo de Aluguel</div>
+                            <div class="card-description">Emitir recibo de aluguel</div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="#" onclick="showPage('termo-vistoria')" class="card-button">
+                            <div class="card-icon">🔍</div>
+                            <div class="card-title">Termo de Vistoria</div>
+                            <div class="card-description">Termo de vistoria do imóvel</div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-4">
+                    <a href="#" onclick="showPage('gestao-condominios')" class="card-button">
+                    <div class="card-icon">🏢</div>
+                    <div class="card-title">Gestão de Condomínios</div>
+                    <div class="card-description">Documentos para gestão condominial</div>
+                </a>
+            </div>
+        </div>
+            
+            <!-- Os cards de links externos serão adicionados automaticamente pelo JavaScript -->
+            
+        </div>
+
+        <!-- Conteúdo das Páginas -->
+        <div id="page-content"></div>
+    </div>
+
+    <!-- Incluir todos os scripts -->
+    <script src="app.js"></script>
+    <script src="cadastroimovel.js"></script>
+    <script src="contratoLocacao.js"></script>
+    <script src="contratoAdministracao.js"></script>
+    <script src="fichaCadastral.js"></script>
+    <script src="reciboAluguel.js"></script>
+    <script src="termoVistoria.js"></script>
+    <script src="condominio.js"></script> 
+</body>
+</html>

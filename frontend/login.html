@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Villares - Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-logo {
+            margin-bottom: 20px;
+        }
+
+        .logo-image {
+            max-width: 180px;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .login-title {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .login-footer {
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- LOGO DA EMPRESA -->
+            <div class="login-logo">
+                <img src="villares.png" alt="Villares Imóveis" class="logo-image">
+            </div>
+            
+            <h1 class="login-title">Villares Imóveis</h1>
+            <p class="login-subtitle">Sistema de Gestão de Documentos</p>
+            
+            <div class="error-message" id="errorMessage"></div>
+            
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuário:</label>
+                    <input type="text" id="username" class="form-control" placeholder="Digite seu usuário" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha:</label>
+                    <input type="password" id="password" class="form-control" placeholder="Digite sua senha" required>
+                </div>
+                
+                <button type="submit" class="login-btn">🔐 Entrar no Sistema</button>
+            </form>
+            
+            <div class="login-footer">
+                <p>Sistema protegido | Versão 1.0</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let USER_CREDENTIALS = {};
+
+        async function loadCredentials() {
+            try {
+                const response = await fetch('auth-config.js');
+                if (!response.ok) throw new Error('Arquivo de configuração não encontrado');
+                
+                const configText = await response.text();
+                const credentialsMatch = configText.match(/const USER_CREDENTIALS\s*=\s*({[\s\S]*?});/);
+                if (credentialsMatch) {
+                    USER_CREDENTIALS = eval(`(${credentialsMatch[1]})`);
+                    console.log('Credenciais carregadas do auth-config.js');
+                } else {
+                    throw new Error('Formato inválido do arquivo de configuração');
+                }
+                
+            } catch (error) {
+                console.warn('Arquivo auth-config.js não encontrado, usando credenciais padrão');
+                USER_CREDENTIALS = {
+                    'admin': 'admin',
+                    'villares': 'villares2025', 
+                    'nicolas': 'villares2025',
+                    'junior': 'villares2025',
+                    'islei': 'villares2025',
+                    'kelly': 'villares2025'
+                };
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (Object.keys(USER_CREDENTIALS).length === 0) {
+                await loadCredentials();
+            }
+            
+            if (USER_CREDENTIALS[username] && USER_CREDENTIALS[username] === password) {
+                localStorage.setItem('isAuthenticated', 'true');
+                localStorage.setItem('currentUser', username);
+                window.location.href = 'index.html';
+            } else {
+                errorMessage.textContent = '❌ Usuário ou senha incorretos!';
+                errorMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 3000);
+            }
+        });
+
+        loadCredentials();
+        document.getElementById('username').focus();
+    </script>
+</body>
+</html>

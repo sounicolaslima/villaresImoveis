@@ -1,0 +1,21 @@
+# Arquivos de configuração sensíveis
+config.js
+auth-config.js
+config.json
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Ambiente
+.env
+.env.local
+.env.production
+
+# Backend
+node_modules/
+package-lock.json
