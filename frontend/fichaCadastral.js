@@ -192,6 +192,15 @@ async function loadFichaCadastralPage() {
                         </div>
                         <div class="col-6">
                             <div class="form-group">
+                                <label>Chave PIX</label>
+                                <input type="text" id="pix" class="form-control" placeholder="Chave PIX">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
                                 <label>Declaração IR</label>
                                 <input type="text" id="declaracaoImposto" class="form-control" placeholder="Declaração de imposto de renda">
                             </div>
@@ -247,6 +256,12 @@ async function loadFichaCadastralPage() {
                             <div class="form-group">
                                 <label>IPTU</label>
                                 <input type="text" id="IPTU" class="form-control" placeholder="IPTU">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Inscrição Cadastral</label>
+                                <input type="text" id="InscricaoIPTU" class="form-control" placeholder="Inscrição Cadastral">
                             </div>
                         </div>
                     </div>
@@ -446,11 +461,13 @@ function collectFichaCadastralFormData() {
         banco: getValue('banco'),
         agencia: getValue('agencia'),
         conta: getValue('conta'),
+        pix: getValue('pix'),
         declaracaoImposto: getValue('declaracaoImposto'),
         enderecoImovel: getValue('enderecoImovel'),
         CemigInstal: getValue('CemigInstal'),
         matriculaCopasa: getValue('matriculaCopasa'),
         IPTU: getValue('IPTU'),
+        InscricaoIPTU: getValue('InscricaoIPTU'),
         fiadores: [],
         caracteristicas: []
     };

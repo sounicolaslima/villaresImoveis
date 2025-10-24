@@ -195,7 +195,12 @@ class App {
             },
             {
                 titulo: "🔐 Senhas Gerais",
-                url: "https://forms.google.com/your-form-link",
+                url: "https://docs.google.com/spreadsheets/d/1laYbRGm8VfgFI7ApcF6Yv4wQObt--3BprjHJuwbBWBY/edit?usp=drive_link",
+                descricao: "Planilha de senhas da imobiliária"
+            },
+            {
+                titulo: "💸 Contas à Pagar",
+                url: "https://docs.google.com/spreadsheets/d/1BOQl9Lcw0WcxdYqQXb1YiB3cKBw6Kmg60uaf88YlyDs/edit?usp=sharing",
                 descricao: "Planilha de senhas da imobiliária"
             }
         ];
