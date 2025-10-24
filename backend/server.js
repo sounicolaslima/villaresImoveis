@@ -201,41 +201,28 @@ app.post('/api/mapear-card-pipefy', async (req, res) => {
     }
 });
 
-// FUNÇÃO AUXILIAR PARA GERAR DOCUMENTOS
-function gerarDocumento(templateName, dados, res, filename) {
-    return new Promise((resolve, reject) => {
+// VERSÃO SIMPLES - SE NÃO TEM DADO, FICA VAZIO
+    function gerarDocumento(templateName, dados, res, filename) {
+        return new Promise((resolve, reject) => {
         try {
             const templatePath = path.join(templatesDir, templateName);
-
             if (!fs.existsSync(templatePath)) {
                 throw new Error(`Template não encontrado: ${templatePath}`);
             }
 
             const content = fs.readFileSync(templatePath, 'binary');
             const zip = new PizZip(content);
-            const doc = new Docxtemplater();
-            doc.loadZip(zip);
 
-            doc.setOptions({
+            const doc = new Docxtemplater(zip, {
                 paragraphLoop: true,
-                linebreaks: true
+                linebreaks: true,
+                // ISSO AQUI É A SOLUÇÃO - faz variáveis não encontradas ficarem vazias
+                nullGetter: function() {
+                    return "";
+                }
             });
 
-            const processedData = {};
-            for (const [key, value] of Object.entries(dados)) {
-                if (value === null || value === undefined) {
-                    processedData[key] = "";
-                } else if (typeof value === 'boolean') {
-                    processedData[key] = value ? 'X' : "";
-                } else if (Array.isArray(value)) {
-                    processedData[key] = value.join(', ');
-                } else {
-                    processedData[key] = value.toString();
-                }
-            }
-
-            doc.setData(processedData);
-            doc.render();
+            doc.render(dados);
 
             const buffer = doc.getZip().generate({
                 type: 'nodebuffer',
@@ -250,9 +237,11 @@ function gerarDocumento(templateName, dados, res, filename) {
             resolve();
 
         } catch (error) {
+            console.error('❌ Erro ao gerar documento:', error);
             reject(error);
         }
     });
+
 }
 
 // ROTAS DE DOCUMENTOS
