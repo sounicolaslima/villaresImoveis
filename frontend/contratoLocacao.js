@@ -407,20 +407,14 @@ function removerFiador(id) {
 }
 
 // FUNÇÃO PARA GERAR CONTRATO DE LOCAÇÃO
+// FUNÇÃO PARA GERAR CONTRATO DE LOCAÇÃO
 async function gerarContratoLocacao() {
-    console.log('Gerando contrato de locação...');
+    console.log('🎯 Clicou em gerar contrato!');
 
     try {
         const dados = coletarDadosFormulario();
 
-        if (!validarDados(dados)) {
-            if (window.app && window.app.showAlert) {
-                window.app.showAlert('Por favor, preencha todos os campos obrigatórios!', 'error');
-            }
-            return;
-        }
-
-        console.log('Dados coletados:', dados);
+        console.log('📦 Dados coletados:', dados);
 
         const response = await fetch('/api/gerar-documento/contrato-locacao', {
             method: 'POST',
@@ -428,12 +422,15 @@ async function gerarContratoLocacao() {
             body: JSON.stringify(dados)
         });
 
+        console.log('📡 Resposta do servidor:', response.status);
+
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Erro no servidor: ${response.status} - ${errorText}`);
         }
 
         const blob = await response.blob();
+        console.log('📄 Blob recebido:', blob.size, 'bytes');
 
         if (blob.size === 0) {
             throw new Error('Arquivo vazio recebido do servidor');
@@ -446,7 +443,7 @@ async function gerarContratoLocacao() {
             downloadBtn.onclick = () => {
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `Contrato_Locacao_${dados.nomeLocatario.replace(/\s+/g, '_')}.docx`;
+                a.download = `Contrato_Locacao_${dados.nomeLocatario || 'Sem_Nome'}.docx`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -473,69 +470,74 @@ async function gerarContratoLocacao() {
 
 // FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO
 function coletarDadosFormulario() {
+    // Função SIMPLES para pegar valor
+    const getValue = (id) => {
+        const element = document.getElementById(id);
+        return element ? element.value : "";
+    };
+
+    // Dados básicos - se não preencher, fica vazio
     const dados = {
         // Dados do Locatário
-        nomeLocatario: document.getElementById('nomeLocatario').value,
-        RG: document.getElementById('RG').value,
-        cpf_locatario: document.getElementById('cpf_locatario').value,
-        endereco: document.getElementById('endereco').value,
-        valorLocacao: document.getElementById('valorLocacao').value,
-        dataEntrada: document.getElementById('dataEntrada').value,
-        dataVenc: document.getElementById('vencimento').value,
-        celular: document.getElementById('celular').value,
-        email: document.getElementById('email').value,
+        nomeLocatario: getValue('nomeLocatario'),
+        RGLocatario: getValue('RG'),
+        CPFLocatario: getValue('cpf_locatario'),
+        endereco: getValue('endereco'),
+        valorLocacaoMensal: getValue('valorLocacao'),
+        dataEntrada: getValue('dataEntrada'),
+        dataVenc: getValue('vencimento'),
+        celular: getValue('celular'),
+        email: getValue('email'),
 
         // Dados do Proprietário
-        nomeProprietario: document.getElementById('nomeProprietario').value,
-        RGProprietario: document.getElementById('RGProprietario').value,
-        CPFProprietario: document.getElementById('CPFProprietario').value,
-        enderecoProprietario: document.getElementById('enderecoProprietario').value,
-        celProprietario: document.getElementById('celProprietario').value,
-        emailProprietario: document.getElementById('emailProprietario').value,
+        nomeProprietario: getValue('nomeProprietario'),
+        RGProprietario: getValue('RGProprietario'),
+        CPFProprietario: getValue('CPFProprietario'),
+        enderecoProprietario: getValue('enderecoProprietario'),
+        celProprietario: getValue('celProprietario'),
+        emailProprietario: getValue('emailProprietario'),
 
         // Dados do Imóvel
-        tipoDoImovel: document.getElementById('tipoDoImovel').value,
-        EnderecoImovel: document.getElementById('EnderecoImovel').value,
-        CEPImovel: document.getElementById('CEPImovel').value,
-        CidadeImovel: document.getElementById('CidadeImovel').value,
-        caracteristicasImovel: document.getElementById('caracteristicasImovel').value,
+        tipoDoImovel: getValue('tipoDoImovel'),
+        enderecoImovel: getValue('EnderecoImovel'),
+        CEPImovel: getValue('CEPImovel'),
+        cidadeImovel: getValue('CidadeImovel'),
+        caracteristicasImovel: getValue('caracteristicasImovel'),
 
         // Serviços
-        matriculaCopasa: document.getElementById('matriculaCopasa').value,
-        hidrometroCopasa: document.getElementById('hidrometroCopasa').value,
-        CemigInstalacao: document.getElementById('CemigInstalacao').value,
-        medidor: document.getElementById('medidor').value,
-        IPTUImovel: document.getElementById('IPTUImovel').value,
-        inscricaoIPTU: document.getElementById('inscricaoIPTU').value,
+        matriculaCopasa: getValue('matriculaCopasa'),
+        hidrometroCopasa: getValue('hidrometroCopasa'),
+        CemigInstalacao: getValue('CemigInstalacao'),
+        numeroMedidor: getValue('medidor'),
+        IPTUImovel: getValue('IPTUImovel'),
+        InscricaoIPTU: getValue('inscricaoIPTU'),
 
         // Duração do Contrato
-        duracao: document.getElementById('duracao').value,
-        dataInicio: document.getElementById('dataInicio').value,
-        dataTermino: document.getElementById('dataTermino').value,
-        ValorLocacaoMensal: document.getElementById('ValorLocacaoMensal').value,
-        mesDeDesocupacao: document.getElementById('mesDeDesocupacao').value,
-        dataContrato: document.getElementById('dataContrato').value,
+        duracao: getValue('duracao'),
+        dataInicio: getValue('dataInicio'),
+        dataTermino: getValue('dataTermino'),
+        valorLocacaoMensal: getValue('ValorLocacaoMensal'),
+        mesDeDesocupacao: getValue('mesDeDesocupacao'),
+        dataContrato: getValue('dataContrato'),
 
-        // Fiadores
+        // Fiadores - array vazio se não tiver
         fiadores: []
     };
 
-    // Coletar dados dos fiadores
+    // Coletar fiadores apenas se existirem
     for (let i = 1; i < fiadoresCount; i++) {
-        const fiadorElement = document.getElementById(`fiador-${i}`);
-        if (fiadorElement) {
-            const fiador = {
-                nome: document.getElementById(`fiadorNome${i}`)?.value || "",
-                rg: document.getElementById(`fiadorRG${i}`)?.value || "",
-                cpf: document.getElementById(`fiadorCPF${i}`)?.value || "",
-                endereco: document.getElementById(`fiadorEndereco${i}`)?.value || "",
-                celular: document.getElementById(`fiadorCelular${i}`)?.value || "",
-                email: document.getElementById(`fiadorEmail${i}`)?.value || "",
-            };
-
-            if (fiador.nome) {
-                dados.fiadores.push(fiador);
-            }
+        const nomeFiador = getValue(`fiadorNome${i}`);
+        
+        // Só adiciona fiador se tiver nome
+        if (nomeFiador && nomeFiador.trim() !== "") {
+            dados.fiadores.push({
+                nome: nomeFiador,
+                rg: getValue(`fiadorRG${i}`),
+                cpf: getValue(`fiadorCPF${i}`),
+                endereco: getValue(`fiadorEndereco${i}`),
+                celular: getValue(`fiadorCelular${i}`),
+                email: getValue(`fiadorEmail${i}`),
+            });
         }
     }
 
@@ -595,7 +597,8 @@ function fillContratoFormWithCardData(cardData) {
         const valor = dados[campo];
         const input = document.getElementById(campo);
         
-        if (input && valor && valor !== "") {
+        // VOLTAR PARA VERSÃO ORIGINAL (que estava funcionando)
+        if (input && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
             input.value = valor;
             camposPreenchidos++;
             console.log(`✅ ${campo}: ${valor}`);
@@ -609,5 +612,6 @@ function fillContratoFormWithCardData(cardData) {
     }
     
     return camposPreenchidos;
-
 }
+
+

@@ -303,13 +303,6 @@ async function gerarContratoAdministracao() {
     try {
         const dados = coletarDadosAdministracaoFormulario();
 
-        if (!validarDadosAdministracao(dados)) {
-            if (window.app && window.app.showAlert) {
-                window.app.showAlert('Por favor, preencha todos os campos obrigatórios!', 'error');
-            }
-            return;
-        }
-
         console.log('Dados coletados:', dados);
 
         const response = await fetch('/api/gerar-documento/contrato-administracao', {
@@ -363,65 +356,55 @@ async function gerarContratoAdministracao() {
 
 // FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO ADMINISTRAÇÃO
 function coletarDadosAdministracaoFormulario() {
+    // Função para pegar o valor ATUAL do campo (seja do Pipefy ou manual)
+    const getValue = (id) => {
+        const element = document.getElementById(id);
+        return element ? element.value : "";
+    };
+
     return {
         // Dados do Proprietário
-        nomeProprietario: document.getElementById('nomeProprietario').value,
-        RGProprietario: document.getElementById('RGProprietario').value,
-        CPFProprietario: document.getElementById('CPFProprietario').value,
-        profissaoProprietario: document.getElementById('profissaoProprietario').value,
-        estadoCivil: document.getElementById('estadoCivil').value,
-        enderecoProprietario: document.getElementById('enderecoProprietario').value,
-        celProprietario: document.getElementById('celProprietario').value,
-        emailProprietario: document.getElementById('emailProprietario').value,
+        nomeProprietario: getValue('nomeProprietario'),
+        RGProprietario: getValue('RGProprietario'),
+        CPFProprietario: getValue('CPFProprietario'),
+        profissaoProprietario: getValue('profissaoProprietario'),
+        estadoCivil: getValue('estadoCivil'),
+        enderecoProprietario: getValue('enderecoProprietario'),
+        celProprietario: getValue('celProprietario'),
+        emailProprietario: getValue('emailProprietario'),
 
         // Dados Bancários
-        banco: document.getElementById('banco').value,
-        agencia: document.getElementById('agencia').value,
-        conta: document.getElementById('conta').value,
-        declaracaoImposto: document.getElementById('declaracaoImposto').value,
+        banco: getValue('banco'),
+        agencia: getValue('agencia'),
+        conta: getValue('conta'),
+        declaracaoImposto: getValue('declaracaoImposto'),
 
         // Dados do Imóvel
-        EnderecoImovel: document.getElementById('EnderecoImovel').value,
-        caracteristicasImovel: document.getElementById('caracteristicasImovel').value,
+        EnderecoImovel: getValue('EnderecoImovel'),
+        caracteristicasImovel: getValue('caracteristicasImovel'),
 
         // Serviços
-        matriculaCopasa: document.getElementById('matriculaCopasa').value,
-        hidrometro: document.getElementById('hidrometro').value,
-        cemigInstal: document.getElementById('cemigInstal').value,
-        numeroMedidor: document.getElementById('numeroMedidor').value,
-        IPTUImovel: document.getElementById('IPTUImovel').value,
-        InscricaoIPTU: document.getElementById('InscricaoIPTU').value,
+        matriculaCopasa: getValue('matriculaCopasa'),
+        hidrometro: getValue('hidrometro'),
+        cemigInstal: getValue('cemigInstal'),
+        numeroMedidor: getValue('numeroMedidor'),
+        IPTUImovel: getValue('IPTUImovel'),
+        InscricaoIPTU: getValue('InscricaoIPTU'),
 
         // Dados do Contrato
-        dataAluguel: document.getElementById('dataAluguel').value,
-        dataInicioContrato: document.getElementById('dataInicioContrato').value,
-        valorAluguel: document.getElementById('valorAluguel').value,
-        dataContrato: document.getElementById('dataContrato').value,
+        dataAluguel: getValue('dataAluguel'),
+        dataInicioContrato: getValue('dataInicioContrato'),
+        valorAluguel: getValue('valorAluguel'),
+        dataContrato: getValue('dataContrato'),
 
         // Testemunhas
-        nomeTestemunha1: document.getElementById('nomeTestemunha1').value,
-        CPFTestemunha1: document.getElementById('CPFTestemunha1').value,
-        nomeTestemunha2: document.getElementById('nomeTestemunha2').value,
-        CPFTestemunha2: document.getElementById('CPFTestemunha2').value
+        nomeTestemunha1: getValue('nomeTestemunha1'),
+        CPFTestemunha1: getValue('CPFTestemunha1'),
+        nomeTestemunha2: getValue('nomeTestemunha2'),
+        CPFTestemunha2: getValue('CPFTestemunha2')
     };
 }
 
-// FUNÇÃO PARA VALIDAR DADOS ADMINISTRAÇÃO
-function validarDadosAdministracao(dados) {
-    const camposObrigatorios = [
-        'nomeProprietario', 'CPFProprietario', 'enderecoProprietario',
-        'EnderecoImovel', 'dataInicioContrato', 'valorAluguel'
-    ];
-
-    for (const campo of camposObrigatorios) {
-        if (!dados[campo] || dados[campo].trim() === "") {
-            console.error(`Campo obrigatório não preenchido: ${campo}`);
-            return false;
-        }
-    }
-
-    return true;
-}
 
 // CARREGAR DADOS DO PIPEFY
 async function loadPipefyDataAdmin() {
@@ -455,20 +438,22 @@ function fillAdminFormWithCardData(cardData) {
     let camposPreenchidos = 0;
 
     Object.keys(dados).forEach(campo => {
-        const valor = dados[campo];
+        const valorPipefy = dados[campo];
         const input = document.getElementById(campo);
         
-        if (input && valor && valor !== "") {
-            input.value = valor;
+        // Só preenche se o Pipefy trouxer dado válido
+        if (input && valorPipefy && valorPipefy !== "") {
+            input.value = valorPipefy;
             camposPreenchidos++;
-            console.log(`✅ ${campo}: ${valor}`);
+            console.log(`✅ ${campo}: ${valorPipefy} (Pipefy)`);
         }
     });
 
-    console.log(`🎉 ${camposPreenchidos} campos preenchidos no admin`);
+    console.log(`🎉 ${camposPreenchidos} campos preenchidos automaticamente pelo Pipefy`);
+    console.log('💡 Você pode editar qualquer campo manualmente antes de gerar o documento!');
     
     if (camposPreenchidos > 0 && window.app && window.app.showAlert) {
-        window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente!`, 'success');
+        window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente. Edite o que precisar!`, 'success');
     }
     
     return camposPreenchidos;

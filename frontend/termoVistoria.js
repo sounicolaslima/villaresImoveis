@@ -394,13 +394,6 @@ async function gerarTermoVistoria() {
         // Coletar dados do formulário
         const dados = coletarDadosVistoriaFormulario();
 
-        if (!validarDadosVistoria(dados)) {
-            if (window.app && window.app.showAlert) {
-                window.app.showAlert('Por favor, preencha todos os campos obrigatórios!', 'error');
-            }
-            return;
-        }
-
         console.log('Dados coletados:', dados);
 
         const response = await fetch('/api/gerar-documento/termo-vistoria', {
@@ -539,23 +532,6 @@ function coletarDadosVistoriaFormulario() {
     }
 
     return dados;
-}
-
-// FUNÇÃO PARA VALIDAR DADOS VISTORIA
-function validarDadosVistoria(dados) {
-    const camposObrigatorios = [
-        'nomeLocatario', 'CPFLocatario', 'enderecoImovel',
-        'dataContrato', 'dataVistoria'
-    ];
-
-    for (const campo of camposObrigatorios) {
-        if (!dados[campo] || dados[campo].trim() === "") {
-            console.error(`Campo obrigatório não preenchido: ${campo}`);
-            return false;
-        }
-    }
-
-    return true;
 }
 
 // CARREGAR DADOS DO PIPEFY
