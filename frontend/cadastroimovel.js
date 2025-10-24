@@ -885,26 +885,33 @@ async function loadPipefyDataCadastro() {
 }
 
 // PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
-function fillCadastroFormWithCardData(card) {
-    const fieldMappings = {
-        'nomeProprietario': 'nome_proprietario',
-        'enderecoImovel': 'endereco_imovel',
-        'valor': 'valor_imovel',
-        'bairro': 'bairro_imovel',
-        'cidade': 'cidade_imovel',
-        'uf': 'uf_imovel'
-    };
+function fillCadastroFormWithCardData(cardData) {
+    console.log('🎯 Preenchendo formulário de cadastro com dados do Pipefy...');
+    
+    const dados = cardData.dadosPreenchidos;
+    let camposPreenchidos = 0;
 
-    Object.keys(fieldMappings).forEach(formField => {
-        const pipefyField = fieldMappings[formField];
-        const value = card.fields ? card.fields[pipefyField] : "";
-        const input = document.getElementById(formField);
-        if (input && value) {
-            input.value = value;
+    // Para CADA campo que veio mapeado do Pipefy
+    Object.keys(dados).forEach(campo => {
+        const valor = dados[campo];
+        const input = document.getElementById(campo);
+        
+        // Se o campo EXISTE no formulário, preenche
+        if (input && valor && valor !== "") {
+            input.value = valor;
+            camposPreenchidos++;
+            console.log(`✅ ${campo}: ${valor}`);
         }
     });
 
-    if (window.app && window.app.showAlert) {
-        window.app.showAlert('Dados do Pipefy carregados com sucesso!', 'success');
+    console.log(`🎉 ${camposPreenchidos} campos preenchidos no cadastro`);
+    
+    if (camposPreenchidos > 0) {
+        if (window.app && window.app.showAlert) {
+            window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente!`, 'success');
+        }
     }
+    
+    return camposPreenchidos;
 }
+

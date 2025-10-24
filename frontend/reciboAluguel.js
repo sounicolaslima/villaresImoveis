@@ -330,27 +330,32 @@ async function loadPipefyDataRecibo() {
 }
 
 // PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
-function fillReciboFormWithCardData(card) {
-    const fieldMappings = {
-        'nomeLocatario': 'nome_locatario',
-        'enderecoImovel': 'endereco_imovel',
-        'valorAluguel': 'valor_aluguel'
-    };
+function fillReciboFormWithCardData(cardData) {
+    console.log('🎯 Preenchendo recibo com dados do Pipefy...');
+    
+    const dados = cardData.dadosPreenchidos;
+    let camposPreenchidos = 0;
 
-    Object.keys(fieldMappings).forEach(formField => {
-        const pipefyField = fieldMappings[formField];
-        const value = card.fields ? card.fields[pipefyField] : "";
-        const input = document.getElementById(formField);
-        if (input && value) {
-            input.value = value;
+    Object.keys(dados).forEach(campo => {
+        const valor = dados[campo];
+        const input = document.getElementById(campo);
+        
+        if (input && valor && valor !== "") {
+            input.value = valor;
+            camposPreenchidos++;
+            console.log(`✅ ${campo}: ${valor}`);
         }
     });
 
-    calcularTotal();
-
-    if (window.app && window.app.showAlert) {
-        window.app.showAlert('Dados do Pipefy carregados com sucesso!', 'success');
+    console.log(`🎉 ${camposPreenchidos} campos preenchidos no recibo`);
+    
+    if (camposPreenchidos > 0 && window.app && window.app.showAlert) {
+        window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente!`, 'success');
     }
+    
+    return camposPreenchidos;
+
+
 }
 
 // GERAR RECIBO
@@ -432,11 +437,4 @@ function collectReciboFormData() {
         valorTotal: getValue('valorTotal'),
         data: getValue('data')
     };
-}
-function preencherTemplate(template, dados) {
-    let resultado = template;
-    for (const [chave, valor] of Object.entries(dados)) {
-        resultado = resultado.replace(new RegExp(`{{${chave}}}`, 'g'), valor);
-    }
-    return resultado;
 }

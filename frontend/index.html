@@ -5,19 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Villares - Documentos</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
 </head>
 <body>
-    <script>
-        // VERIFICAÇÃO DE AUTENTICAÇÃO - REDIRECIONA PARA LOGIN SE NÃO ESTIVER AUTENTICADO
+      <script>
         (function() {
             const isAuthenticated = localStorage.getItem('isAuthenticated');
             const currentUser = localStorage.getItem('currentUser');
             
             if (!isAuthenticated || !currentUser) {
-                // Limpar qualquer dado residual
+                console.log('❌ Usuário não autenticado, redirecionando para login...');
                 localStorage.removeItem('isAuthenticated');
                 localStorage.removeItem('currentUser');
-                // Redirecionar para login
                 window.location.href = 'login.html';
             }
         })();
@@ -32,7 +31,6 @@
 
         <ul class="sidebar-menu">
             <li><a href="#" onclick="showPage('dashboard')" class="active">📊 Dashboard</a></li>
-            <!-- Formulários removidos da sidebar -->
             <li><a href="#" onclick="logout()" style="color: #dc3545;">🚪 Sair</a></li>
         </ul>
 
@@ -46,9 +44,11 @@
     <div class="main-content">
         <!-- Dashboard -->
         <div id="dashboard" class="dashboard-container">
-            <!-- TÍTULO CENTRALIZADO - REMOVIDO user-info -->
             <div class="page-header">
                 <h1>📊 Dashboard - Sistema de Documentos</h1>
+                <div class="user-info">
+                    <span id="current-user-display">Usuário</span>
+                </div>
             </div>
 
             <div class="alert alert-info">
@@ -106,15 +106,17 @@
                     </div>
                 </div>
 
+                <!-- Gestão de Condomínios -->
                 <div class="row mt-3">
                     <div class="col-4">
-                    <a href="#" onclick="showPage('gestao-condominios')" class="card-button">
-                    <div class="card-icon">🏢</div>
-                    <div class="card-title">Gestão de Condomínios</div>
-                    <div class="card-description">Documentos para gestão condominial</div>
-                </a>
+                        <a href="#" onclick="showPage('gestao-condominios')" class="card-button">
+                            <div class="card-icon">🏢</div>
+                            <div class="card-title">Gestão de Condomínios</div>
+                            <div class="card-description">Documentos para gestão condominial</div>
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
             
             <!-- Os cards de links externos serão adicionados automaticamente pelo JavaScript -->
             
@@ -132,6 +134,33 @@
     <script src="fichaCadastral.js"></script>
     <script src="reciboAluguel.js"></script>
     <script src="termoVistoria.js"></script>
-    <script src="condominio.js"></script> 
+    <script src="condominio.js"></script>
+
+    <script>
+        // Funções globais necessárias
+        function logout() {
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+
+        function goBack() {
+            showPage('dashboard');
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Sistema carregado - Usuário:', localStorage.getItem('currentUser'));
+            
+            // Atualizar display do usuário
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                const userElements = document.querySelectorAll('#current-user, #current-user-display');
+                userElements.forEach(el => {
+                    if (el) el.textContent = currentUser;
+                });
+            }
+        });
+    </script>
 </body>
 </html>

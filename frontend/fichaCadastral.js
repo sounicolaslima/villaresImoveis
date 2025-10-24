@@ -507,27 +507,29 @@ async function loadPipefyDataFicha() {
     }
 }
 
-// PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
-function fillFichaFormWithCardData(card) {
-    const fieldMappings = {
-        'nomeLocatario': 'nome_completo',
-        'cpf_locatario': 'cpf',
-        'email': 'email',
-        'celular': 'telefone',
-        'endereco': 'endereco',
-        'valorLocacao': 'valor'
-    };
+function fillFichaFormWithCardData(cardData) {
+    console.log('🎯 Preenchendo ficha cadastral com dados do Pipefy...');
+    
+    const dados = cardData.dadosPreenchidos;
+    let camposPreenchidos = 0;
 
-    Object.keys(fieldMappings).forEach(formField => {
-        const pipefyField = fieldMappings[formField];
-        const value = card.fields ? card.fields[pipefyField] : "";
-        const input = document.getElementById(formField);
-        if (input && value) {
-            input.value = value;
+    Object.keys(dados).forEach(campo => {
+        const valor = dados[campo];
+        const input = document.getElementById(campo);
+        
+        if (input && valor && valor !== "") {
+            input.value = valor;
+            camposPreenchidos++;
+            console.log(`✅ ${campo}: ${valor}`);
         }
     });
 
-    if (window.app && window.app.showAlert) {
-        window.app.showAlert('Dados do Pipefy carregados com sucesso!', 'success');
+    console.log(`🎉 ${camposPreenchidos} campos preenchidos na ficha`);
+    
+    if (camposPreenchidos > 0 && window.app && window.app.showAlert) {
+        window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente!`, 'success');
     }
+    
+    return camposPreenchidos;
 }
+
