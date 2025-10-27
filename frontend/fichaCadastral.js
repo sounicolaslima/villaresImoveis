@@ -42,7 +42,7 @@ async function loadFichaCadastralPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>RG</label>
-                                <input type="text" id="RG" class="form-control" placeholder="00.000.000-0">
+                                <input type="text" id="RGLocatario" class="form-control" placeholder="00.000.000-0">
                             </div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@ async function loadFichaCadastralPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>CPF Locatário</label>
-                                <input type="text" id="cpf_locatario" class="form-control" placeholder="000.000.000-00">
+                                <input type="text" id="CPFLocatario" class="form-control" placeholder="000.000.000-00">
                             </div>
                         </div>
                         <div class="col-6">
@@ -66,7 +66,7 @@ async function loadFichaCadastralPage() {
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Valor Locação</label>
-                                <input type="text" id="valorLocacao" class="form-control" placeholder="R$ 0,00">
+                                <input type="text" id="valorLocacaoMensal" class="form-control" placeholder="R$ 0,00">
                             </div>
                         </div>
                         <div class="col-4">
@@ -240,7 +240,7 @@ async function loadFichaCadastralPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>CEMIG Instalação</label>
-                                <input type="text" id="CemigInstal" class="form-control" placeholder="Número da instalação">
+                                <input type="text" id="CemigInstalacao" class="form-control" placeholder="Número da instalação">
                             </div>
                         </div>
                         <div class="col-6">
@@ -255,7 +255,7 @@ async function loadFichaCadastralPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>IPTU</label>
-                                <input type="text" id="IPTU" class="form-control" placeholder="IPTU">
+                                <input type="text" id="IPTUimovel" class="form-control" placeholder="IPTU">
                             </div>
                         </div>
                         <div class="col-6">
@@ -464,11 +464,11 @@ function coletarDadosFichaCadastral() {
     const dados = {
         // Dados do Locatário
         nomeLocatario: getValue('nomeLocatario'),
-        RG: getValue('RG'),
-        cpf_locatario: getValue('cpf_locatario'),
+        RGLocatario: getValue('RGLocatario'),
+        CPFLocatario: getValue('CPFLocatario'),
         endereco: getValue('endereco'),
-        valorLocacao: getValue('valorLocacao'),
-        dataEntrada: getValue('dataEntrada'),
+        valorLocacaoMensal: getValue('valorLocacaoMensal'),
+        dataEntrada: getValue('dataEntrada'),          
         dataVenc: getValue('dataVenc'),
         celular: getValue('celular'),
         email: getValue('email'),
@@ -492,9 +492,9 @@ function coletarDadosFichaCadastral() {
         enderecoImovel: getValue('enderecoImovel'),
 
         // Serviços
-        CemigInstal: getValue('CemigInstal'),
+        CemigInstalacao: getValue('CemigInstalacao'),
         matriculaCopasa: getValue('matriculaCopasa'),
-        IPTU: getValue('IPTU'),
+        IPTUimovel: getValue('IPTUimovel'),
         InscricaoIPTU: getValue('InscricaoIPTU'),
 
         // Características
@@ -566,25 +566,88 @@ async function loadPipefyDataFicha() {
     }
 }
 
-// PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
+// MAPEAMENTO PERSONALIZADO PIPEFY -> FORMULÁRIO
+function getPipefyFieldMappings() {
+    return {
+        // Dados do Locatário
+        'nomeLocatario': 'nomeLocatario',
+        'RGLocatario': 'RGLocatario',
+        'CPFLocatario': 'CPFLocatario',
+        'endereco': 'endereco',
+        'valor_aluguel': 'valorLocacaoMensal',
+        'data_entrada': 'dataEntrada',         
+        'vencimento': 'dataVenc',  
+        'celular': 'celular',
+        'email': 'email',
+        
+        // Dados do Proprietário
+        'nome_proprietario': 'nomeProprietario',
+        'rg_proprietario': 'RGProprietario',
+        'cpf_proprietario': 'CPFProprietario',
+        'endereco_proprietario': 'enderecoProprietario',
+        'celular_proprietario': 'celProprietario',
+        'email_proprietario': 'emailProprietario',
+        
+        // Dados Bancários
+        'banco': 'banco',
+        'agencia': 'agencia',
+        'conta_corrente': 'conta',
+        'chave_pix': 'pix',
+        'declaracaoImposto': 'declaracaoImposto',
+        
+        // Dados do Imóvel
+        'endereco_imovel': 'enderecoImovel',
+        
+        // Serviços
+        'cemig_instalacao': 'CemigInstalacao',
+        'copasa_matricula': 'matriculaCopasa',
+        'iptu': 'IPTUimovel',
+        'inscricao_iptu': 'InscricaoIPTU',
+        
+        // Fiadores
+        'nomeFiador1': 'nomeFiador',
+        'CPFFiador1': 'CPFFiador',
+        'RGFiador1': 'RGFiador',
+        'enderecoFiador1': 'enderecoFiador',
+        'celularFiador1': 'celularFiador',
+        'emailFiador1': 'emailFiador',
+        
+    };
+}
+
+// FUNÇÃO MELHORADA PARA PREENCHER FORMULÁRIO
 function fillFichaFormWithCardData(cardData) {
     console.log('🎯 Preenchendo ficha cadastral com dados do Pipefy...');
     
     const dados = cardData.dadosPreenchidos;
+    const mappings = getPipefyFieldMappings();
     let camposPreenchidos = 0;
 
-    Object.keys(dados).forEach(campo => {
-        const valor = dados[campo];
-        const input = document.getElementById(campo);
+    // Preenchimento por mapeamento personalizado E direto
+    Object.keys(dados).forEach(campoPipefy => {
+        const valor = dados[campoPipefy];
         
-        if (input && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
-            input.value = valor;
+        // 1. Tentar preencher pelo mapeamento personalizado
+        const campoFormulario = mappings[campoPipefy];
+        if (campoFormulario) {
+            const input = document.getElementById(campoFormulario);
+            if (input && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
+                input.value = valor;
+                camposPreenchidos++;
+                console.log(`✅ ${campoPipefy} -> ${campoFormulario}: ${valor}`);
+            }
+        }
+        
+        // 2. Também tentar preenchimento direto (para compatibilidade)
+        const inputDireto = document.getElementById(campoPipefy);
+        if (inputDireto && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
+            inputDireto.value = valor;
             camposPreenchidos++;
-            console.log(`✅ ${campo}: ${valor}`);
+            console.log(`✅ ${campoPipefy}: ${valor}`);
         }
     });
 
-    console.log(`🎉 ${camposPreenchidos} campos preenchidos na ficha`);
+    console.log(`🎉 ${camposPreenchidos} campos preenchidos automaticamente`);
     
     if (camposPreenchidos > 0 && window.app && window.app.showAlert) {
         window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente!`, 'success');

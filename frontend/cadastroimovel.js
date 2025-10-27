@@ -735,9 +735,7 @@ async function gerarCadastroImovel() {
     }
 }
 
-// FUNÇÃO COLETAR DADOS CORRIGIDA (COMPLETA)
 function collectCadastroImovelFormData() {
-    // CORREÇÃO: Garantir que todos os campos tenham valores padrão
     const getValue = (id, defaultValue = "") => {
         const element = document.getElementById(id);
         return element ? (element.value || defaultValue) : defaultValue;
@@ -748,22 +746,30 @@ function collectCadastroImovelFormData() {
         return element ? element.checked : false;
     };
 
-    const getCheckedValue = (idTrue, idFalse) => {
-        return getChecked(idTrue) ? "Sim" : "Não";
+    // CORREÇÃO: Checkboxes retornam "X" quando marcados, VAZIO quando não
+    const getCheckboxValue = (id) => {
+        return getChecked(id) ? "X" : ""; // ← "X" ou "" (vazio)
+    };
+
+    // CORREÇÃO: Para checkboxes Sim/Não
+    const getRadioCheckboxValue = (trueId, falseId) => {
+        if (getChecked(trueId)) return "Sim";
+        if (getChecked(falseId)) return "Não";
+        return "";
     };
 
     return {
         // Valor e tipo
         "valor": getValue('valor'),
-        "aluguel": getChecked('aluguel') ? "X" : "",
-        "venda": getChecked('venda') ? "X" : "",
+        "aluguel": getCheckboxValue('aluguel'),
+        "venda": getCheckboxValue('venda'),
         
         // Tipo de imóvel
-        "casa": getChecked('casa') ? "X" : "",
-        "Apto": getChecked('apto') ? "X" : "",
-        "Sitio": getChecked('sitio') ? "X" : "",
-        "Lotes": getChecked('lotes') ? "X" : "",
-        "outros": getChecked('outros') ? "X" : "",
+        "casa": getCheckboxValue('casa'),
+        "Apto": getCheckboxValue('apto'),
+        "Sitio": getCheckboxValue('sitio'),
+        "Lotes": getCheckboxValue('lotes'),
+        "outros": getCheckboxValue('outros'),
         
         // Dados do imóvel
         "enderecoImovel": getValue('enderecoImovel'),
@@ -782,9 +788,9 @@ function collectCadastroImovelFormData() {
         "copaImovel": getValue('copas'),
         "banheiroImovel": getValue('banheiros'),
         "ACimovel": getValue('areaConstruida'),
-        "Quintal": getCheckedValue('quintalSim', 'quintalNao'),
+        "Quintal": getRadioCheckboxValue('quintalSim', 'quintalNao'),
         "GaragemImovel": getValue('vagas'),
-        "areaServImovel": getCheckedValue('areaServicoSim', 'areaServicoNao'),
+        "areaServImovel": getRadioCheckboxValue('areaServicoSim', 'areaServicoNao'),
         "revestimento": getValue('revestimento'),
         "esquadrilha": getValue('esquadrilha'),
         "piso": getValue('piso'),
@@ -795,40 +801,40 @@ function collectCadastroImovelFormData() {
         "localizacao": getValue('referencia'),
         "observacoes": getValue('observacoes'),
         
-        // Características do imóvel (checkboxes)
-        "interfone": getChecked('interfone'),
-        "areaPriv": getChecked('areaPriv'),
-        "churrasqueira": getChecked('churrasqueira'),
-        "sala_de_jogos": getChecked('sala_de_jogos'),
-        "lavabo": getChecked('lavabo'),
-        "ArmQuarto": getChecked('ArmQuarto'),
-        "AQsOLAR": getChecked('AQsOLAR'),
-        "salaoFests": getChecked('salaoFests'),
-        "despensa": getChecked('despensa'),
-        "armCozinha": getChecked('armCozinha'),
-        "Aggas": getChecked('Aggas'),
-        "numerodepavimentos": getChecked('numerodepavimentos'),
-        "DCE": getChecked('dce'),
-        "boxBanheiro": getChecked('boxBanheiro'),
-        "aquecEletrico": getChecked('aquecEletrico'),
-        "numeroapto": getChecked('numeroapto'),
-        "varanda": getChecked('varanda'),
-        "arealazer": getChecked('arealazer'),
-        "porteiroFisico": getChecked('porteiroFisico'),
-        "garagem": getChecked('garagem'),
-        "rouparia": getChecked('rouparia'),
-        "closet": getChecked('closet'),
-        "sauna": getChecked('sauna'),
-        "nelevador": getChecked('nelevador'),
-        "box": getChecked('box'),
-        "salaGinastica": getChecked('salaGinastica'),
-        "piscina": getChecked('piscina'),
-        "escritorio": getChecked('escritorio'),
-        "AREACLARIDAD": getChecked('AREACLARIDAD'),
-        "playground": getChecked('playground'),
-        "salaTV": getChecked('salaTV'),
-        "SACADA": getChecked('SACADA'),
-        "quadra": getChecked('quadra'),
+        // Características do imóvel (checkboxes) - CORREÇÃO: "X" ou VAZIO
+        "interfone": getCheckboxValue('interfone'),
+        "areaPriv": getCheckboxValue('areaPriv'),
+        "churrasqueira": getCheckboxValue('churrasqueira'),
+        "sala_de_jogos": getCheckboxValue('sala_de_jogos'),
+        "lavabo": getCheckboxValue('lavabo'),
+        "ArmQuarto": getCheckboxValue('ArmQuarto'),
+        "AQsOLAR": getCheckboxValue('AQsOLAR'),
+        "salaoFests": getCheckboxValue('salaoFests'),
+        "despensa": getCheckboxValue('despensa'),
+        "armCozinha": getCheckboxValue('armCozinha'),
+        "Aggas": getCheckboxValue('Aggas'),
+        "numerodepavimentos": getCheckboxValue('numerodepavimentos'),
+        "DCE": getCheckboxValue('dce'),
+        "boxBanheiro": getCheckboxValue('boxBanheiro'),
+        "aquecEletrico": getCheckboxValue('aquecEletrico'),
+        "numeroapto": getCheckboxValue('numeroapto'),
+        "varanda": getCheckboxValue('varanda'),
+        "arealazer": getCheckboxValue('arealazer'),
+        "porteiroFisico": getCheckboxValue('porteiroFisico'),
+        "garagem": getCheckboxValue('garagem'),
+        "rouparia": getCheckboxValue('rouparia'),
+        "closet": getCheckboxValue('closet'),
+        "sauna": getCheckboxValue('sauna'),
+        "nelevador": getCheckboxValue('nelevador'),
+        "box": getCheckboxValue('box'),
+        "salaGinastica": getCheckboxValue('salaGinastica'),
+        "piscina": getCheckboxValue('piscina'),
+        "escritorio": getCheckboxValue('escritorio'),
+        "AREACLARIDAD": getCheckboxValue('AREACLARIDAD'),
+        "playground": getCheckboxValue('playground'),
+        "salaTV": getCheckboxValue('salaTV'),
+        "SACADA": getCheckboxValue('SACADA'),
+        "quadra": getCheckboxValue('quadra'),
         "valorCond": getValue('valorCond'),
         "metFrente": getValue('metFrente'),
         "topografia": getValue('topografia'),
@@ -855,11 +861,10 @@ function collectCadastroImovelFormData() {
 
         // Chaves
         "qtdChaves": getValue('qtdChaves', '1'),
-        "copiaVillares": getChecked('copiaVillares'),
-        "copiaProprietario": getChecked('copiaProprietario')
+        "copiaVillares": getCheckboxValue('copiaVillares'),
+        "copiaProprietario": getCheckboxValue('copiaProprietario')
     };
 }
-
 // CARREGAR DADOS DO PIPEFY
 async function loadPipefyDataCadastro() {
     try {

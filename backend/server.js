@@ -293,6 +293,15 @@ app.post('/api/gerar-documento/termo-vistoria', async (req, res) => {
     }
 });
 
+app.post('/api/gerar-documento/gestaodecondominio', async (req, res) => {
+    try {
+        await gerarDocumento('condominios.docx', req.body, res, 'Relatorio_Financeiro_Condominio.docx');
+    } catch (error) {
+        console.error('❌ Erro ao gerar relatório de condomínio:', error);
+        res.status(500).json({ error: 'Erro ao gerar relatório de condomínio: ' + error.message });
+    }
+});
+
 // HEALTH CHECK
 app.get('/health', (req, res) => {
     res.json({
@@ -310,7 +319,8 @@ app.get('/api/verificar-templates', (req, res) => {
         'contrato_administracao.docx': fs.existsSync(path.join(templatesDir, 'contrato_administracao.docx')),
         'fichaCadastral.docx': fs.existsSync(path.join(templatesDir, 'fichaCadastral.docx')),
         'recibo.docx': fs.existsSync(path.join(templatesDir, 'recibo.docx')),
-        'vistoria_corrigido_dinamico.docx': fs.existsSync(path.join(templatesDir, 'vistoria_corrigido_dinamico.docx'))
+        'vistoria_corrigido_dinamico.docx': fs.existsSync(path.join(templatesDir, 'vistoria_corrigido_dinamico.docx')),
+        'condominios.docx': fs.existsSync(path.join(templatesDir, 'condominios.docx'))
     };
     
     res.json({ templates: templates });

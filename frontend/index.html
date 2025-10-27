@@ -6,6 +6,8 @@
     <title>Sistema Villares - Documentos</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
+    <!-- ADICIONAR: Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
       <script>
@@ -31,6 +33,8 @@
 
         <ul class="sidebar-menu">
             <li><a href="#" onclick="showPage('dashboard')" class="active">📊 Dashboard</a></li>
+            <!-- ADICIONAR: Item do menu para Vistorias -->
+            <li><a href="#" onclick="showPage('vistorias')">📸 Vistorias</a></li>
             <li><a href="#" onclick="logout()" style="color: #dc3545;">🚪 Sair</a></li>
         </ul>
 
@@ -115,6 +119,14 @@
                             <div class="card-description">Documentos para gestão condominial</div>
                         </a>
                     </div>
+                    <!-- ADICIONAR: Card do Sistema de Vistorias ao lado do Gestão de Condomínios -->
+                    <div class="col-4">
+                        <a href="#" onclick="showPage('vistorias')" class="card-button">
+                            <div class="card-icon">📸</div>
+                            <div class="card-title">Sistema de Vistorias</div>
+                            <div class="card-description">Upload e gestão de fotos de vistorias</div>
+                        </a>
+                    </div>
                 </div>
             </div>
             
@@ -135,6 +147,8 @@
     <script src="reciboAluguel.js"></script>
     <script src="termoVistoria.js"></script>
     <script src="condominio.js"></script>
+    <!-- ADICIONAR: Script do Sistema de Vistorias -->
+    <script src="sistemaVistorias.js"></script>
 
     <script>
         // Funções globais necessárias
@@ -147,6 +161,91 @@
         function goBack() {
             showPage('dashboard');
         }
+
+        // CORREÇÃO: Função showPage com parâmetro event
+        function showPage(page, event = null) {
+    const pageContent = document.getElementById('page-content');
+    const dashboard = document.getElementById('dashboard');
+    
+    // Esconder todas as páginas
+    dashboard.style.display = 'none';
+    if (pageContent) pageContent.innerHTML = '';
+    
+    // Atualizar menu ativo
+    document.querySelectorAll('.sidebar-menu a').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    if (event && event.target) {
+        event.target.classList.add('active');
+    } else {
+        const menuItem = document.querySelector(`.sidebar-menu a[onclick*="${page}"]`);
+        if (menuItem) {
+            menuItem.classList.add('active');
+        }
+    }
+    
+    // Mostrar dashboard ou página específica
+    if (page === 'dashboard') {
+        dashboard.style.display = 'block';
+        if (window.app) {
+            window.app.carregarFraseInternet();
+        }
+    } else if (page === 'vistorias') {
+        if (typeof loadVistoriasPage === 'function') {
+            loadVistoriasPage();
+        } else {
+            console.error('Sistema de vistorias não carregado');
+            pageContent.innerHTML = `
+                <div class="page-container">
+                    <div class="page-header">
+                        <button class="btn btn-secondary" onclick="showPage('dashboard')">← VOLTAR</button>
+                        <h1>📸 SISTEMA DE VISTORIAS</h1>
+                    </div>
+                    <div class="alert alert-danger">
+                        Sistema de vistorias não disponível.
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        // USAR O pageLoaders DO app.js PARA AS OUTRAS PÁGINAS
+        dashboard.style.display = 'none';
+        
+        // Verificar se existe no pageLoaders do app.js
+        if (window.pageLoaders && window.pageLoaders[page]) {
+            window.pageLoaders[page]();
+        } else {
+            // Fallback para o método antigo
+            switch(page) {
+                case 'cadastro-imovel':
+                    if (typeof loadCadastroImovelPage === 'function') loadCadastroImovelPage();
+                    break;
+                case 'contrato-locacao':
+                    if (typeof loadContratoLocacaoPage === 'function') loadContratoLocacaoPage();
+                    break;
+                case 'contrato-administracao':
+                    if (typeof loadContratoAdministracaoPage === 'function') loadContratoAdministracaoPage();
+                    break;
+                case 'ficha-cadastral':
+                    if (typeof loadFichaCadastralPage === 'function') loadFichaCadastralPage();
+                    break;
+                case 'recibo-aluguel':
+                    if (typeof loadReciboAluguelPage === 'function') loadReciboAluguelPage();
+                    break;
+                case 'termo-vistoria':
+                    if (typeof loadTermoVistoriaPage === 'function') loadTermoVistoriaPage();
+                    break;
+                case 'gestao-condominios':
+                    if (typeof loadRelatorioPage === 'function') loadRelatorioPage();
+                    break;
+                default:
+                    console.log('Página não encontrada:', page);
+                    pageContent.innerHTML = '<div class="alert alert-danger">Página não encontrada</div>';
+            }
+        }
+    }
+}
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {

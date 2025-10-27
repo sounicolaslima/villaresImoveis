@@ -1,4 +1,4 @@
-// app.js - VERSÃO COMPLETA COM FRASES DA INTERNET + LINKS EXTERNOS + PIPEFY
+//app.js - VERSÃO COMPLETA COM FRASES DA INTERNET + LINKS EXTERNOS + PIPEFY
 console.log('🚀 Sistema Villares');
 
 class App {
@@ -471,7 +471,8 @@ function showPage(pageName) {
             'contrato-locacao': () => loadContratoLocacaoPage(),
             'contrato-administracao': () => loadContratoAdministracaoPage(),
             'ficha-cadastral': () => loadFichaCadastralPage(),
-            'gestao-condominios': () => loadGestaoCondominiosPage()
+            'gestao-condominios': () => loadRelatorioPage(),
+            'vistorias': () => loadVistoriasPage()
         };
 
         if (pageLoaders[pageName]) {

@@ -7,10 +7,18 @@ const MAPEAMENTO_PIPEFY = {
     'Digite o e-mail do Locatário': 'email',
     'Digite o Endereço Residencial da Locação': 'enderecoImovel',
     'Valor mensal do aluguel': 'valorAluguel',
+    'Digite o Nome do Fiador Completo': 'nomeFiador1',
+    'Digite o RG do Fiador': 'RGFiador1',
+    'Digite o CPF do Fiador': 'CPFFiador1',
+    'Digite o Endereço Residencial Completo do Fiador': 'enderecoFiador1',
+    'Digite o Whatsapp do Fiador': 'celularFiador1',
+    'Digite o e-mail do Fiador': 'emailFiador1',
     'Nº de Matrícula (COPASA)': 'matriculaCopasa',
     'Nº do Hidrômetro (COPASA)': 'hidrometro',
     'Nº de Instalação CEMIG': 'CemigInstalacao',
     'Nº do Medidor (CEMIG)': 'numeroMedidor',
+    'IPTU' : 'IPTUimovel',
+    'Nº Inscrição Cadastral IPTU' :'InscricaoIPTU',
     'Nome do Proprietário': 'nomeProprietario',
     'CPF do Proprietário': 'CPFProprietario',
     'RG do Proprietário': 'RGProprietario', 
@@ -20,6 +28,8 @@ const MAPEAMENTO_PIPEFY = {
     'Banco': 'banco',
     'Agência': 'agencia',
     'Conta Corrente': 'conta',
+    'Chave PIX': 'pix',
+    
 };
 
 module.exports = MAPEAMENTO_PIPEFY;

@@ -41,7 +41,7 @@ async function loadContratoLocacaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>RG</label>
-                                <input type="text" id="RG" class="form-control" placeholder="00.000.000-0">
+                                <input type="text" id="RGLocatario" class="form-control" placeholder="00.000.000-0">
                             </div>
                         </div>
                     </div>
@@ -50,7 +50,7 @@ async function loadContratoLocacaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>CPF</label>
-                                <input type="text" id="cpf_locatario" class="form-control" placeholder="000.000.000-00">
+                                <input type="text" id="CPFLocatario" class="form-control" placeholder="000.000.000-00">
                             </div>
                         </div>
                         <div class="col-6">
@@ -245,7 +245,7 @@ async function loadContratoLocacaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>IPTU</label>
-                                <input type="text" id="IPTUImovel" class="form-control" placeholder="IPTU">
+                                <input type="text" id="IPTUimovel" class="form-control" placeholder="IPTU">
                             </div>
                         </div>
                         <div class="col-6">
@@ -479,7 +479,6 @@ async function gerarContratoLocacao() {
 
 
 // FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO - COM OS NOMES CORRETOS PARA O TEMPLATE
-// FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO - COM OS NOMES CORRETOS PARA O TEMPLATE
 function coletarDadosFormulario() {
     const getValue = (id) => {
         const element = document.getElementById(id);
@@ -489,7 +488,7 @@ function coletarDadosFormulario() {
     const dados = {
         // Dados do Locatário
         nomeLocatario: getValue('nomeLocatario'),
-        RGLocatario: getValue('RG'),
+        RGLocatario: getValue('RGLocatario'),
         CPFLocatario: getValue('cpf_locatario'),
         endereco: getValue('endereco'),
         valorLocacaoMensal: getValue('valorLocacao'),
@@ -518,7 +517,7 @@ function coletarDadosFormulario() {
         hidrometroCopasa: getValue('hidrometroCopasa'),
         CemigInstalacao: getValue('CemigInstalacao'),
         numeroMedidor: getValue('medidor'),
-        IPTUImovel: getValue('IPTUImovel'),
+        IPTUimovel: getValue('IPTUimovel'),
         InscricaoIPTU: getValue('inscricaoIPTU'),
 
         // Duração do Contrato
@@ -608,29 +607,79 @@ async function loadPipefyDataContrato() {
     }
 }
 
-/// PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
+// MAPEAMENTO PERSONALIZADO PIPEFY -> FORMULÁRIO LOCAÇÃO
+function getPipefyFieldMappingsLocacao() {
+    return {
+        // Dados do Locatário
+        'nomeLocatario': 'nomeLocatario',
+        'CPFLocatario': 'CPFlocatario', 
+        'RGLocatario' :'RGLocatario' ,
+        'email': 'email',
+        'celular': 'celular',
+        'enderecoImovel': 'EnderecoImovel', 
+        
+        // Dados do Proprietário
+        'nomeProprietario': 'nomeProprietario',
+        'RGProprietario': 'RGProprietario',
+        'CPFProprietario': 'CPFProprietario', 
+        'enderecoProprietario': 'enderecoProprietario',
+        'celProprietario': 'celProprietario',
+        'emailProprietario': 'emailProprietario',
+        
+        // Dados Bancários
+        'banco': 'banco',
+        'agencia': 'agencia',
+        'conta': 'conta',
+        'pix': 'pix',
+        
+        // Serviços
+        'CemigInstalacao': 'CemigInstalacao', 
+        'matriculaCopasa': 'matriculaCopasa',
+        'hidrometro': 'hidrometroCopasa', 
+        'numeroMedidor': 'medidor', 
+        'iptu': 'IPTUimovel',
+        'inscricao_iptu': 'InscricaoIPTU',
+        
+    };
+}
+
+// SUBSTITUA A FUNÇÃO fillContratoFormWithCardData POR ESTA:
 function fillContratoFormWithCardData(cardData) {
     console.log('🎯 Preenchendo contrato locação com dados do Pipefy...');
     
     const dados = cardData.dadosPreenchidos;
+    const mappings = getPipefyFieldMappingsLocacao(); // USE O MAPEAMENTO
     let camposPreenchidos = 0;
 
-    Object.keys(dados).forEach(campo => {
-        const valor = dados[campo];
-        const input = document.getElementById(campo);
+    // Preenchimento por mapeamento personalizado E direto
+    Object.keys(dados).forEach(campoPipefy => {
+        const valor = dados[campoPipefy];
         
-        if (input && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
-            input.value = valor;
+        // 1. Tentar preencher pelo mapeamento personalizado
+        const campoFormulario = mappings[campoPipefy];
+        if (campoFormulario) {
+            const input = document.getElementById(campoFormulario);
+            if (input && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
+                input.value = valor;
+                camposPreenchidos++;
+                console.log(`✅ ${campoPipefy} -> ${campoFormulario}: ${valor}`);
+            }
+        }
+        
+        // 2. Também tentar preenchimento direto (para compatibilidade)
+        const inputDireto = document.getElementById(campoPipefy);
+        if (inputDireto && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
+            inputDireto.value = valor;
             camposPreenchidos++;
-            console.log(`✅ ${campo}: ${valor}`);
+            console.log(`✅ ${campoPipefy}: ${valor}`);
         }
     });
 
-    console.log(`🎉 ${camposPreenchidos} campos preenchidos no contrato`);
+    console.log(`🎉 ${camposPreenchidos} campos preenchidos automaticamente`);
     
     if (camposPreenchidos > 0 && window.app && window.app.showAlert) {
         window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente!`, 'success');
     }
     
     return camposPreenchidos;
-} 
+}

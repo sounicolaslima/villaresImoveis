@@ -164,7 +164,7 @@ async function loadContratoAdministracaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>CEMIG Instalação</label>
-                                <input type="text" id="cemigInstal" class="form-control" placeholder="Número da instalação">
+                                <input type="text" id="CemigInstalacao" class="form-control" placeholder="Número da instalação">
                             </div>
                         </div>
                         <div class="col-6">
@@ -179,7 +179,7 @@ async function loadContratoAdministracaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>IPTU Imóvel</label>
-                                <input type="text" id="IPTUImovel" class="form-control" placeholder="IPTU">
+                                <input type="text" id="IPTUimovel" class="form-control" placeholder="IPTU">
                             </div>
                         </div>
                         <div class="col-6">
@@ -386,9 +386,9 @@ function coletarDadosAdministracaoFormulario() {
         // Serviços
         matriculaCopasa: getValue('matriculaCopasa'),
         hidrometro: getValue('hidrometro'),
-        cemigInstal: getValue('cemigInstal'),
+        cemigInstalacao: getValue('cemigInstalacao'),
         numeroMedidor: getValue('numeroMedidor'),
-        IPTUImovel: getValue('IPTUImovel'),
+        IPTUimovel: getValue('IPTUimovel'),
         InscricaoIPTU: getValue('InscricaoIPTU'),
 
         // Dados do Contrato
@@ -430,30 +430,69 @@ async function loadPipefyDataAdmin() {
     }
 }
 
-// PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
+// MAPEAMENTO PERSONALIZADO PIPEFY -> FORMULÁRIO ADMINISTRAÇÃO
+function getPipefyFieldMappingsAdmin() {
+    return {
+        // Dados do Proprietário
+        'nomeProprietario': 'nomeProprietario',
+        'RGProprietario': 'RGProprietario',
+        'CPFProprietario': 'CPFProprietario', 
+        'enderecoProprietario': 'enderecoProprietario',
+        'celProprietario': 'celProprietario',
+        'emailProprietario': 'emailProprietario',
+        
+        // Dados Bancários
+        'banco': 'banco',
+        'agencia': 'agencia',
+        'conta': 'conta',
+        'pix': 'pix',
+        
+        // Serviços - CORRIGIDOS
+        'CemigInstalacao': 'cemigInstalacao', 
+        'matriculaCopasa': 'matriculaCopasa',
+        'hidrometro': 'hidrometro',
+        'numeroMedidor': 'numeroMedidor',
+        'enderecoImovel': 'EnderecoImovel', 
+        
+    };
+}
+
+// SUBSTITUA A FUNÇÃO fillAdminFormWithCardData POR ESTA:
 function fillAdminFormWithCardData(cardData) {
     console.log('🎯 Preenchendo contrato administração com dados do Pipefy...');
     
     const dados = cardData.dadosPreenchidos;
+    const mappings = getPipefyFieldMappingsAdmin(); // USE O MAPEAMENTO
     let camposPreenchidos = 0;
 
-    Object.keys(dados).forEach(campo => {
-        const valorPipefy = dados[campo];
-        const input = document.getElementById(campo);
+    // Preenchimento por mapeamento personalizado E direto
+    Object.keys(dados).forEach(campoPipefy => {
+        const valor = dados[campoPipefy];
         
-        // Só preenche se o Pipefy trouxer dado válido
-        if (input && valorPipefy && valorPipefy !== "") {
-            input.value = valorPipefy;
+        // 1. Tentar preencher pelo mapeamento personalizado
+        const campoFormulario = mappings[campoPipefy];
+        if (campoFormulario) {
+            const input = document.getElementById(campoFormulario);
+            if (input && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
+                input.value = valor;
+                camposPreenchidos++;
+                console.log(`✅ ${campoPipefy} -> ${campoFormulario}: ${valor}`);
+            }
+        }
+        
+        // 2. Também tentar preenchimento direto (para compatibilidade)
+        const inputDireto = document.getElementById(campoPipefy);
+        if (inputDireto && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
+            inputDireto.value = valor;
             camposPreenchidos++;
-            console.log(`✅ ${campo}: ${valorPipefy} (Pipefy)`);
+            console.log(`✅ ${campoPipefy}: ${valor}`);
         }
     });
 
-    console.log(`🎉 ${camposPreenchidos} campos preenchidos automaticamente pelo Pipefy`);
-    console.log('💡 Você pode editar qualquer campo manualmente antes de gerar o documento!');
+    console.log(`🎉 ${camposPreenchidos} campos preenchidos automaticamente`);
     
     if (camposPreenchidos > 0 && window.app && window.app.showAlert) {
-        window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente. Edite o que precisar!`, 'success');
+        window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente!`, 'success');
     }
     
     return camposPreenchidos;

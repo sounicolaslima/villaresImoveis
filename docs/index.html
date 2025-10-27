@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Villares - Documentos</title>
+    <title>Sistema Villares </title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
+    <!-- ADICIONAR: Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
       <script>
@@ -31,6 +33,8 @@
 
         <ul class="sidebar-menu">
             <li><a href="#" onclick="showPage('dashboard')" class="active">📊 Dashboard</a></li>
+            <!-- ADICIONAR: Item do menu para Vistorias -->
+            <li><a href="#" onclick="showPage('vistorias')">📸 Vistorias</a></li>
             <li><a href="#" onclick="logout()" style="color: #dc3545;">🚪 Sair</a></li>
         </ul>
 
@@ -57,7 +61,7 @@
 
             <!-- Cards de Formulários -->
             <div class="form-cards-section">
-                <h2 class="section-title">📋 Formulários</h2>
+                <h2 class="section-title">📋 Formulários e Sistema de Vistorias</h2>
                 <div class="row">
                     <div class="col-4">
                         <a href="#" onclick="showPage('cadastro-imovel')" class="card-button">
@@ -115,6 +119,14 @@
                             <div class="card-description">Documentos para gestão condominial</div>
                         </a>
                     </div>
+                    <!-- ADICIONAR: Card do Sistema de Vistorias ao lado do Gestão de Condomínios -->
+                    <div class="col-4">
+                        <a href="#" onclick="showPage('vistorias')" class="card-button">
+                            <div class="card-icon">📸</div>
+                            <div class="card-title">Sistema de Vistorias</div>
+                            <div class="card-description">Upload e gestão de fotos de vistorias</div>
+                        </a>
+                    </div>
                 </div>
             </div>
             
@@ -135,6 +147,8 @@
     <script src="reciboAluguel.js"></script>
     <script src="termoVistoria.js"></script>
     <script src="condominio.js"></script>
+    <!-- ADICIONAR: Script do Sistema de Vistorias -->
+    <script src="sistemaVistorias.js"></script>
 
     <script>
         // Funções globais necessárias
@@ -148,11 +162,94 @@
             showPage('dashboard');
         }
 
-        // Inicialização
+        // ADICIONAR: Suporte para página de vistorias mantendo toda a lógica existente
+        function showPage(page) {
+            const pageContent = document.getElementById('page-content');
+            const dashboard = document.getElementById('dashboard');
+            
+            // Esconder todas as páginas (MANTIDO ORIGINAL)
+            dashboard.style.display = 'none';
+            pageContent.innerHTML = '';
+            
+            // Atualizar menu ativo (MANTIDO ORIGINAL)
+            document.querySelectorAll('.sidebar-menu a').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Mostrar dashboard ou página específica (MANTIDO ORIGINAL com ADIÇÃO)
+            if (page === 'dashboard') {
+                dashboard.style.display = 'block';
+            } else if (page === 'vistorias') {
+                // NOVO: Chamar função do sistema de vistorias
+                if (typeof loadVistoriasPage === 'function') {
+                    loadVistoriasPage();
+                } else {
+                    console.error('Sistema de vistorias não carregado');
+                    pageContent.innerHTML = `
+                        <div class="page-container">
+                            <div class="page-header">
+                                <button class="btn btn-secondary" onclick="showPage('dashboard')">← VOLTAR</button>
+                                <h1>📸 SISTEMA DE VISTORIAS</h1>
+                            </div>
+                            <div class="alert alert-danger">
+                                Sistema de vistorias não disponível. Verifique se o arquivo sistemaVistorias.js foi carregado.
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                // MANTIDO ORIGINAL: Suas páginas existentes
+                dashboard.style.display = 'none';
+                
+                // MANTIDO ORIGINAL: Lógica para outras páginas
+                switch(page) {
+                    case 'cadastro-imovel':
+                        if (typeof loadCadastroImovelPage === 'function') {
+                            loadCadastroImovelPage();
+                        }
+                        break;
+                    case 'contrato-locacao':
+                        if (typeof loadContratoLocacaoPage === 'function') {
+                            loadContratoLocacaoPage();
+                        }
+                        break;
+                    case 'contrato-administracao':
+                        if (typeof loadContratoAdministracaoPage === 'function') {
+                            loadContratoAdministracaoPage();
+                        }
+                        break;
+                    case 'ficha-cadastral':
+                        if (typeof loadFichaCadastralPage === 'function') {
+                            loadFichaCadastralPage();
+                        }
+                        break;
+                    case 'recibo-aluguel':
+                        if (typeof loadReciboAluguelPage === 'function') {
+                            loadReciboAluguelPage();
+                        }
+                        break;
+                    case 'termo-vistoria':
+                        if (typeof loadTermoVistoriaPage === 'function') {
+                            loadTermoVistoriaPage();
+                        }
+                        break;
+                    case 'gestao-condominios':
+                        if (typeof loadCondominioPage === 'function') {
+                            loadCondominioPage();
+                        }
+                        break;
+                    default:
+                        console.log('Página não encontrada:', page);
+                }
+            }
+        }
+
+        // Inicialização (MANTIDO ORIGINAL)
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Sistema carregado - Usuário:', localStorage.getItem('currentUser'));
             
-            // Atualizar display do usuário
+            // Atualizar display do usuário (MANTIDO ORIGINAL)
             const currentUser = localStorage.getItem('currentUser');
             if (currentUser) {
                 const userElements = document.querySelectorAll('#current-user, #current-user-display');
