@@ -407,14 +407,23 @@ function removerFiador(id) {
 }
 
 // FUNÇÃO PARA GERAR CONTRATO DE LOCAÇÃO
-// FUNÇÃO PARA GERAR CONTRATO DE LOCAÇÃO
 async function gerarContratoLocacao() {
     console.log('🎯 Clicou em gerar contrato!');
 
     try {
         const dados = coletarDadosFormulario();
 
-        console.log('📦 Dados coletados:', dados);
+        // DEBUG DETALHADO
+        console.log('📦 DADOS COLETADOS:');
+        console.log('- Nome Locatário:', dados.nomeLocatario);
+        console.log('- Total de Fiadores:', dados.fiadores.length);
+        console.log('- Fiadores:', dados.fiadores);
+        
+        if (dados.fiadores.length === 0) {
+            console.log('⚠️  AVISO: Nenhum fiador foi preenchido!');
+        }
+
+        console.log('🚀 Enviando para o servidor...');
 
         const response = await fetch('/api/gerar-documento/contrato-locacao', {
             method: 'POST',
@@ -468,15 +477,15 @@ async function gerarContratoLocacao() {
     }
 }
 
-// FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO
+
+// FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO - COM OS NOMES CORRETOS PARA O TEMPLATE
+// FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO - COM OS NOMES CORRETOS PARA O TEMPLATE
 function coletarDadosFormulario() {
-    // Função SIMPLES para pegar valor
     const getValue = (id) => {
         const element = document.getElementById(id);
         return element ? element.value : "";
     };
 
-    // Dados básicos - se não preencher, fica vazio
     const dados = {
         // Dados do Locatário
         nomeLocatario: getValue('nomeLocatario'),
@@ -520,29 +529,42 @@ function coletarDadosFormulario() {
         mesDeDesocupacao: getValue('mesDeDesocupacao'),
         dataContrato: getValue('dataContrato'),
 
-        // Fiadores - array vazio se não tiver
+        // Fiadores - COM OS NOMES QUE ESTÃO NO TEMPLATE
         fiadores: []
     };
 
-    // Coletar fiadores apenas se existirem
+    // Coletar fiadores com os nomes corretos para o template
     for (let i = 1; i < fiadoresCount; i++) {
         const nomeFiador = getValue(`fiadorNome${i}`);
         
         // Só adiciona fiador se tiver nome
         if (nomeFiador && nomeFiador.trim() !== "") {
-            dados.fiadores.push({
-                nome: nomeFiador,
-                rg: getValue(`fiadorRG${i}`),
-                cpf: getValue(`fiadorCPF${i}`),
-                endereco: getValue(`fiadorEndereco${i}`),
-                celular: getValue(`fiadorCelular${i}`),
-                email: getValue(`fiadorEmail${i}`),
-            });
+            const fiadorObj = {
+                nomeFiador: nomeFiador, // ← Nome que está no template
+                RGFiador: getValue(`fiadorRG${i}`) || "", // ← Nome que está no template
+                CPFFiador: getValue(`fiadorCPF${i}`) || "", // ← Nome que está no template
+                enderecoFiador: getValue(`fiadorEndereco${i}`) || "", // ← Nome que está no template
+                celularFiador: getValue(`fiadorCelular${i}`) || "", // ← Nome que está no template
+                emailFiador: getValue(`fiadorEmail${i}`) || "", // ← Nome que está no template
+            };
+            
+            dados.fiadores.push(fiadorObj);
+            
+            console.log(`✅ Fiador ${i} com nomes corretos:`, fiadorObj);
         }
     }
 
+    console.log('📦 Dados completos para envio:', {
+        nomeLocatario: dados.nomeLocatario,
+        totalFiadores: dados.fiadores.length,
+        fiadores: dados.fiadores
+    });
+
     return dados;
-}
+
+
+    }  
+
 
 // FUNÇÃO PARA VALIDAR DADOS
 function validarDados(dados) {
@@ -586,7 +608,7 @@ async function loadPipefyDataContrato() {
     }
 }
 
-// PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
+/// PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
 function fillContratoFormWithCardData(cardData) {
     console.log('🎯 Preenchendo contrato locação com dados do Pipefy...');
     
@@ -597,7 +619,6 @@ function fillContratoFormWithCardData(cardData) {
         const valor = dados[campo];
         const input = document.getElementById(campo);
         
-        // VOLTAR PARA VERSÃO ORIGINAL (que estava funcionando)
         if (input && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
             input.value = valor;
             camposPreenchidos++;
@@ -612,6 +633,4 @@ function fillContratoFormWithCardData(cardData) {
     }
     
     return camposPreenchidos;
-}
-
-
+} 

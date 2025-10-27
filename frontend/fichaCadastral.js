@@ -297,70 +297,79 @@ async function loadFichaCadastralPage() {
     await loadPipefyDataFicha();
 }
 
-// ADICIONAR FIADOR
+// ADICIONAR FIADOR - ATUALIZADA
 function adicionarFiadorFicha() {
     const container = document.getElementById('fiadores-ficha-container');
     if (!container) return;
 
     const fiadorHTML = `
-        <div class="fiador-dynamic-group">
-            <button type="button" class="remove-fiador" onclick="removerFiadorFicha(this)">×</button>
-            <h5>Fiador ${fiadoresFichaCount}</h5>
+        <div class="fiador-item mb-3 p-3 border rounded" id="fiador-ficha-${fiadoresFichaCount}">
+            <div class="row">
+                <div class="col-11">
+                    <h5>Fiador ${fiadoresFichaCount}</h5>
+                </div>
+                <div class="col-1">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removerFiadorFicha(${fiadoresFichaCount})">×</button>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
                         <label>Nome</label>
-                        <input type="text" id="fiador_ficha${fiadoresFichaCount}_nome" class="form-control" placeholder="Nome completo">
+                        <input type="text" id="fiadorNome${fiadoresFichaCount}" class="form-control" placeholder="Nome completo">
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
                         <label>RG</label>
-                        <input type="text" id="fiador_ficha${fiadoresFichaCount}_rg" class="form-control" placeholder="00.000.000-0">
+                        <input type="text" id="fiadorRG${fiadoresFichaCount}" class="form-control" placeholder="00.000.000-0">
                     </div>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
                         <label>CPF</label>
-                        <input type="text" id="fiador_ficha${fiadoresFichaCount}_cpf" class="form-control" placeholder="000.000.000-00">
+                        <input type="text" id="fiadorCPF${fiadoresFichaCount}" class="form-control" placeholder="000.000.000-00">
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label>Celular</label>
-                        <input type="text" id="fiador_ficha${fiadoresFichaCount}_cel" class="form-control" placeholder="(00) 00000-0000">
-                    </div>
-                </div>
-            </div>
-            <div class="row">
                 <div class="col-6">
                     <div class="form-group">
                         <label>Endereço</label>
-                        <input type="text" id="fiador_ficha${fiadoresFichaCount}_end" class="form-control" placeholder="Endereço completo">
+                        <input type="text" id="fiadorEndereco${fiadoresFichaCount}" class="form-control" placeholder="Endereço completo">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>Celular</label>
+                        <input type="text" id="fiadorCelular${fiadoresFichaCount}" class="form-control" placeholder="(00) 00000-0000">
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
                         <label>E-mail</label>
-                        <input type="email" id="fiador_ficha${fiadoresFichaCount}_email" class="form-control" placeholder="email@exemplo.com">
+                        <input type="email" id="fiadorEmail${fiadoresFichaCount}" class="form-control" placeholder="email@exemplo.com">
                     </div>
                 </div>
             </div>
         </div>
     `;
 
-    container.innerHTML += fiadorHTML;
+    container.insertAdjacentHTML('beforeend', fiadorHTML);
     fiadoresFichaCount++;
 }
 
-// REMOVER FIADOR
-function removerFiadorFicha(button) {
-    const fiadorGroup = button.parentElement;
-    fiadorGroup.remove();
-    // Reorganizar contadores se necessário
-    fiadoresFichaCount = Math.max(1, fiadoresFichaCount - 1);
+// REMOVER FIADOR - ATUALIZADA
+function removerFiadorFicha(id) {
+    const fiadorElement = document.getElementById(`fiador-ficha-${id}`);
+    if (fiadorElement) {
+        fiadorElement.remove();
+    }
 }
 
 // ADICIONAR CARACTERÍSTICA
@@ -375,22 +384,32 @@ function adicionarCaracteristica() {
         </div>
     `;
 
-    container.innerHTML += caracHTML;
+    container.insertAdjacentHTML('beforeend', caracHTML);
 }
 
-// GERAR FICHA CADASTRAL
+// GERAR FICHA CADASTRAL - CORRIGIDA
 async function gerarFichaCadastral() {
     console.log('📄 Gerando ficha cadastral...');
 
     try {
-        const formData = collectFichaCadastralFormData();
+        const dados = coletarDadosFichaCadastral();
 
-        console.log('Dados do formulário:', formData);
+        // DEBUG DETALHADO
+        console.log('📦 DADOS COLETADOS FICHA:');
+        console.log('- Nome Locatário:', dados.nomeLocatario);
+        console.log('- Total de Fiadores:', dados.fiadores.length);
+        console.log('- Fiadores:', dados.fiadores);
+        
+        if (dados.fiadores.length === 0) {
+            console.log('⚠️  AVISO: Nenhum fiador foi preenchido!');
+        }
+
+        console.log('🚀 Enviando para o servidor...');
 
         const response = await fetch('/api/gerar-documento/ficha-cadastral', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(formData)
+            body: JSON.stringify(dados)
         });
 
         if (!response.ok) {
@@ -411,7 +430,7 @@ async function gerarFichaCadastral() {
             downloadBtn.onclick = () => {
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'Ficha_Cadastral.docx';
+                a.download = `Ficha_Cadastral_${dados.nomeLocatario || 'Sem_Nome'}.docx`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -435,14 +454,15 @@ async function gerarFichaCadastral() {
     }
 }
 
-// COLETAR DADOS DO FORMULÁRIO
-function collectFichaCadastralFormData() {
-    const getValue = (id, defaultValue = "") => {
+// COLETAR DADOS DO FORMULÁRIO - CORRIGIDA
+function coletarDadosFichaCadastral() {
+    const getValue = (id) => {
         const element = document.getElementById(id);
-        return element ? (element.value || defaultValue) : defaultValue;
+        return element ? element.value : "";
     };
 
-    const data = {
+    const dados = {
+        // Dados do Locatário
         nomeLocatario: getValue('nomeLocatario'),
         RG: getValue('RG'),
         cpf_locatario: getValue('cpf_locatario'),
@@ -452,52 +472,74 @@ function collectFichaCadastralFormData() {
         dataVenc: getValue('dataVenc'),
         celular: getValue('celular'),
         email: getValue('email'),
+
+        // Dados do Proprietário
         nomeProprietario: getValue('nomeProprietario'),
         RGProprietario: getValue('RGProprietario'),
         CPFProprietario: getValue('CPFProprietario'),
         enderecoProprietario: getValue('enderecoProprietario'),
         celProprietario: getValue('celProprietario'),
         emailProprietario: getValue('emailProprietario'),
+
+        // Dados Bancários
         banco: getValue('banco'),
         agencia: getValue('agencia'),
         conta: getValue('conta'),
         pix: getValue('pix'),
         declaracaoImposto: getValue('declaracaoImposto'),
+
+        // Dados do Imóvel
         enderecoImovel: getValue('enderecoImovel'),
+
+        // Serviços
         CemigInstal: getValue('CemigInstal'),
         matriculaCopasa: getValue('matriculaCopasa'),
         IPTU: getValue('IPTU'),
         InscricaoIPTU: getValue('InscricaoIPTU'),
-        fiadores: [],
-        caracteristicas: []
+
+        // Características
+        caracteristicas: [],
+
+        // Fiadores - COM OS NOMES CORRETOS PARA O TEMPLATE
+        fiadores: []
     };
-
-    // Coletar fiadores
-    for (let i = 1; i < fiadoresFichaCount; i++) {
-        const fiador = {
-            nome: getValue(`fiador_ficha${i}_nome`),
-            rg: getValue(`fiador_ficha${i}_rg`),
-            cpf: getValue(`fiador_ficha${i}_cpf`),
-            end: getValue(`fiador_ficha${i}_end`),
-            cel: getValue(`fiador_ficha${i}_cel`),
-            email: getValue(`fiador_ficha${i}_email`)
-        };
-
-        // Só adicionar se tiver pelo menos nome ou CPF
-        if (fiador.nome || fiador.cpf) {
-            data.fiadores.push(fiador);
-        }
-    }
 
     // Coletar características
     for (let i = 1; i <= caracteristicasCount; i++) {
         const caracteristica = getValue(`caracteristica${i}`);
-        if (caracteristica.trim()) {
-            data.caracteristicas.push(caracteristica.trim());
+        if (caracteristica && caracteristica.trim() !== "") {
+            dados.caracteristicas.push(caracteristica.trim());
         }
     }
 
-    return data;
+    // Coletar fiadores com os nomes corretos para o template
+    for (let i = 1; i < fiadoresFichaCount; i++) {
+        const nomeFiador = getValue(`fiadorNome${i}`);
+        
+        // Só adiciona fiador se tiver nome
+        if (nomeFiador && nomeFiador.trim() !== "") {
+            const fiadorObj = {
+                nomeFiador: nomeFiador,
+                RGFiador: getValue(`fiadorRG${i}`) || "",
+                CPFFiador: getValue(`fiadorCPF${i}`) || "",
+                enderecoFiador: getValue(`fiadorEndereco${i}`) || "",
+                celularFiador: getValue(`fiadorCelular${i}`) || "",
+                emailFiador: getValue(`fiadorEmail${i}`) || "",
+            };
+            
+            dados.fiadores.push(fiadorObj);
+            
+            console.log(`✅ Fiador ${i} da ficha:`, fiadorObj);
+        }
+    }
+
+    console.log('📦 Dados completos da ficha para envio:', {
+        nomeLocatario: dados.nomeLocatario,
+        totalFiadores: dados.fiadores.length,
+        fiadores: dados.fiadores
+    });
+
+    return dados;
 }
 
 // CARREGAR DADOS DO PIPEFY
@@ -524,6 +566,7 @@ async function loadPipefyDataFicha() {
     }
 }
 
+// PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
 function fillFichaFormWithCardData(cardData) {
     console.log('🎯 Preenchendo ficha cadastral com dados do Pipefy...');
     
@@ -534,7 +577,7 @@ function fillFichaFormWithCardData(cardData) {
         const valor = dados[campo];
         const input = document.getElementById(campo);
         
-        if (input && valor && valor !== "") {
+        if (input && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
             input.value = valor;
             camposPreenchidos++;
             console.log(`✅ ${campo}: ${valor}`);
@@ -549,4 +592,3 @@ function fillFichaFormWithCardData(cardData) {
     
     return camposPreenchidos;
 }
-

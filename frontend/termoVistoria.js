@@ -1,5 +1,5 @@
 //==========================================================
-// TERMO DE VISTORIA - CORRIGIDO
+// TERMO DE VISTORIA - CÓDIGO CORRIGIDO
 //==========================================================
 
 let fiadoresVistoriaCount = 1;
@@ -391,15 +391,52 @@ async function gerarTermoVistoria() {
     console.log('Gerando termo de vistoria...');
 
     try {
-        // Coletar dados do formulário
-        const dados = coletarDadosVistoriaFormulario();
+        const dadosForm = coletarDadosVistoriaFormulario();
 
-        console.log('Dados coletados:', dados);
+        // ESTRUTURA SIMPLES - IGUAL AOS FIADORES
+        const dadosParaTemplate = {
+            // ... (mantenha todos os outros campos igual)
+            nomeLocatario: dadosForm.nomeLocatario,
+            RGLocatario: dadosForm.RG,
+            CPFLocatario: dadosForm.CPFLocatario,
+            enderecoLocatario: dadosForm.endereco,
+            celular: dadosForm.celular,
+            email: dadosForm.email,
+            enderecoImovel: dadosForm.enderecoImovel,
+            dataContrato: dadosForm.dataContrato,
+            dataVistoria: dadosForm.dataVistoria,
+            nomeVistoriador: dadosForm.nomeVistoriador,
+            dia: dadosForm.dia,
+            mes: dadosForm.mes,
+            ano: dadosForm.ano,
+            nomeTestemunha1: dadosForm.TESTEMUNHA1,
+            CPFTestemunha1: dadosForm.CPFTestemunha1,
+            nomeTestemunha2: dadosForm.TESTEMUNHA2,
+            CPFTestemunha2: dadosForm.CPFTestemunha2,
+            
+            // FIADORES - formato que funciona
+            fiadores: dadosForm.fiadores,
+            
+            // CÔMODOS - MESMO FORMATO DOS FIADORES: array de strings
+            comodos: dadosForm.comodos.map(comodo => {
+                // Formatar igual aos fiadores - APENAS STRINGS
+                const caracteristicasStr = comodo.caracteristicas.map(carac => 
+                    `${carac.nome} - ${carac.estado} - ${carac.descricao}`
+                ).join(' | ');
+                
+                return `CÔMODO: ${comodo.nome} | CARACTERÍSTICAS: ${caracteristicasStr}`;
+            })
+        };
 
+        console.log('🎯 DADOS ENVIADOS:');
+        console.log('Fiadores:', dadosParaTemplate.fiadores);
+        console.log('Cômodos:', dadosParaTemplate.comodos);
+
+        // ... resto do código igual
         const response = await fetch('/api/gerar-documento/termo-vistoria', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(dados)
+            body: JSON.stringify(dadosParaTemplate)
         });
 
         if (!response.ok) {
@@ -413,6 +450,8 @@ async function gerarTermoVistoria() {
             throw new Error('Arquivo vazio recebido do servidor');
         }
 
+        console.log('✅ Documento gerado com sucesso!');
+
         const url = window.URL.createObjectURL(blob);
 
         const downloadBtn = document.getElementById('download-btn-vistoria');
@@ -420,7 +459,7 @@ async function gerarTermoVistoria() {
             downloadBtn.onclick = () => {
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `Termo_Vistoria_${dados.nomeLocatario.replace(/\s+/g, '_')}.docx`;
+                a.download = `Termo_Vistoria_${dadosForm.nomeLocatario.replace(/\s+/g, '_')}.docx`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -445,31 +484,31 @@ async function gerarTermoVistoria() {
     }
 }
 
-// FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO VISTORIA
+// FUNÇÃO ÚNICA PARA COLETAR DADOS DO FORMULÁRIO VISTORIA - CORRIGIDA
 function coletarDadosVistoriaFormulario() {
     const dados = {
         // Dados do Locatário
-        nomeLocatario: document.getElementById('nomeLocatario').value,
-        RG: document.getElementById('RG').value,
-        CPFLocatario: document.getElementById('CPFLocatario').value,
-        endereco: document.getElementById('endereco').value,
-        celular: document.getElementById('celular').value,
-        email: document.getElementById('email').value,
-        enderecoImovel: document.getElementById('enderecoImovel').value,
+        nomeLocatario: document.getElementById('nomeLocatario')?.value || "",
+        RG: document.getElementById('RG')?.value || "",
+        CPFLocatario: document.getElementById('CPFLocatario')?.value || "",
+        endereco: document.getElementById('endereco')?.value || "",
+        celular: document.getElementById('celular')?.value || "",
+        email: document.getElementById('email')?.value || "",
+        enderecoImovel: document.getElementById('enderecoImovel')?.value || "",
 
         // Datas
-        dataContrato: document.getElementById('dataContrato').value,
-        dataVistoria: document.getElementById('dataVistoria').value,
-        nomeVistoriador: document.getElementById('nomeVistoriador').value,
-        dia: document.getElementById('dia').value,
-        mes: document.getElementById('mes').value,
-        ano: document.getElementById('ano').value,
+        dataContrato: document.getElementById('dataContrato')?.value || "",
+        dataVistoria: document.getElementById('dataVistoria')?.value || "",
+        nomeVistoriador: document.getElementById('nomeVistoriador')?.value || "",
+        dia: document.getElementById('dia')?.value || "",
+        mes: document.getElementById('mes')?.value || "",
+        ano: document.getElementById('ano')?.value || "",
 
         // Testemunhas
-        TESTEMUNHA1: document.getElementById('TESTEMUNHA1').value,
-        CPFTestemunha1: document.getElementById('CPFTestemunha1').value,
-        TESTEMUNHA2: document.getElementById('TESTEMUNHA2').value,
-        CPFTestemunha2: document.getElementById('CPFTestemunha2').value,
+        TESTEMUNHA1: document.getElementById('TESTEMUNHA1')?.value || "",
+        CPFTestemunha1: document.getElementById('CPFTestemunha1')?.value || "",
+        TESTEMUNHA2: document.getElementById('TESTEMUNHA2')?.value || "",
+        CPFTestemunha2: document.getElementById('CPFTestemunha2')?.value || "",
 
         // Fiadores
         fiadores: [],
@@ -478,29 +517,41 @@ function coletarDadosVistoriaFormulario() {
         comodos: []
     };
 
+    console.log('🔍 INICIANDO COLETA DE FIADORES...');
+
     // Coletar fiadores
     for (let i = 1; i < fiadoresVistoriaCount; i++) {
         const fiadorElement = document.getElementById(`fiador-vistoria-${i}`);
-        if (fiadorElement) {
-            const fiador = {
-                nome: document.getElementById(`fiadorNome${i}`)?.value || "",
-                cpf: document.getElementById(`fiadorCPF${i}`)?.value || "",
-                rg: document.getElementById(`fiadorRG${i}`)?.value || "",
-                telefone: document.getElementById(`fiadorTelefone${i}`)?.value || "",
-                endereco: document.getElementById(`fiadorEndereco${i}`)?.value || ""
-            };
+        console.log(`Verificando fiador ${i}:`, fiadorElement);
+        
+        if (fiadorElement && fiadorElement.offsetParent !== null) {
+            const nome = document.getElementById(`fiadorNome${i}`)?.value || "";
+            const cpf = document.getElementById(`fiadorCPF${i}`)?.value || "";
+            const rg = document.getElementById(`fiadorRG${i}`)?.value || "";
+            const telefone = document.getElementById(`fiadorTelefone${i}`)?.value || "";
+            const endereco = document.getElementById(`fiadorEndereco${i}`)?.value || "";
 
-            if (fiador.nome) {
-                dados.fiadores.push(fiador);
+            console.log(`Fiador ${i} dados:`, { nome, cpf, rg, telefone, endereco });
+
+            if (nome.trim()) {
+                const fiadorString = `FIADOR(A): ${nome}\nRG: ${rg} CPF: ${cpf}\nENDEREÇO: ${endereco}\nCELULAR: ${telefone} E-MAIL: `;
+                dados.fiadores.push(fiadorString);
+                console.log(`✅ Fiador ${i} adicionado:`, fiadorString);
             }
         }
     }
 
+    console.log('🔍 INICIANDO COLETA DE CÔMODOS...');
+
     // Coletar cômodos e características
     for (let i = 1; i <= comodosCount; i++) {
         const comodoElement = document.getElementById(`comodo-${i}`);
-        if (comodoElement) {
+        console.log(`Verificando cômodo ${i}:`, comodoElement);
+        
+        if (comodoElement && comodoElement.offsetParent !== null) {
             const comodoNome = document.getElementById(`comodoNome${i}`)?.value || "";
+            console.log(`Cômodo ${i} nome:`, comodoNome);
+            
             if (comodoNome.trim()) {
                 const comodo = {
                     nome: comodoNome,
@@ -509,12 +560,27 @@ function coletarDadosVistoriaFormulario() {
 
                 // Coletar características do cômodo
                 const container = document.getElementById(`caracteristicas-comodo-${i}`);
+                console.log(`Container do cômodo ${i}:`, container);
+                
                 if (container) {
-                    const caracteristicasElements = container.children;
-                    for (let j = 0; j < caracteristicasElements.length; j++) {
-                        const caracNome = document.getElementById(`comodo${i}carac${j+1}nome`)?.value || "";
-                        const caracEstado = document.getElementById(`comodo${i}carac${j+1}estado`)?.value || 'Bom';
-                        const caracDesc = document.getElementById(`comodo${i}carac${j+1}desc`)?.value || "";
+                    // PEGA TODOS OS INPUTS DIRETAMENTE
+                    const inputsNome = container.querySelectorAll('input[id*="nome"]');
+                    const selectsEstado = container.querySelectorAll('select[id*="estado"]');
+                    const inputsDesc = container.querySelectorAll('input[id*="desc"]');
+
+                    console.log(`Características encontradas no cômodo ${i}:`, {
+                        nomes: inputsNome.length,
+                        estados: selectsEstado.length, 
+                        descs: inputsDesc.length
+                    });
+
+                    // Para cada característica
+                    for (let j = 0; j < inputsNome.length; j++) {
+                        const caracNome = inputsNome[j]?.value || "";
+                        const caracEstado = selectsEstado[j]?.value || 'Bom';
+                        const caracDesc = inputsDesc[j]?.value || "";
+
+                        console.log(`Característica ${j+1}:`, { caracNome, caracEstado, caracDesc });
 
                         if (caracNome.trim()) {
                             comodo.caracteristicas.push({
@@ -522,14 +588,22 @@ function coletarDadosVistoriaFormulario() {
                                 estado: caracEstado,
                                 descricao: caracDesc
                             });
+                            console.log(`✅ Característica ${j+1} adicionada`);
                         }
                     }
                 }
 
                 dados.comodos.push(comodo);
+                console.log(`✅ Cômodo ${i} adicionado:`, comodo);
             }
         }
     }
+
+    console.log('📋 DADOS FINAIS COLETADOS:', {
+        fiadores: dados.fiadores.length,
+        comodos: dados.comodos.length,
+        comodosDetalhes: dados.comodos
+    });
 
     return dados;
 }
@@ -583,5 +657,4 @@ function fillVistoriaFormWithCardData(cardData) {
     }
     
     return camposPreenchidos;
-
 }
