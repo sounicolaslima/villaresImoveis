@@ -741,160 +741,48 @@ textarea.form-control {
     animation: fadeIn 0.3s ease-in-out;
 }
 
-/*==== RESPONSIVIDADE ====*/
-@media (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        box-shadow: none;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .main-content {
-        margin-left: 0;
-        padding: 15px;
-    }
-
-    .col-4, .col-6 {
-        flex: 0 0 100%;
-    }
-
-    .row {
-        margin: 0;
-    }
-
-    .page-header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-
-    .card-button, .external-link-card {
-        height: auto;
-        min-height: 120px;
-        padding: 15px 10px;
-    }
-
-    .card-icon {
-        font-size: 2.5rem;
-    }
-
-    .form-cards-section, .external-links-section {
-        margin: 20px 0;
-        padding: 15px;
-    }
-
-    .form-container {
-        padding: 20px;
-    }
-
-    .form-header {
-        padding: 20px;
-        margin: -20px -20px 20px -20px;
-    }
-
-    .form-two-columns,
-    .form-with-sidebar {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .field-address,
-    .field-personal,
-    .field-documentos {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .dropdown-content {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 300px;
-    }
-
-    .custom-alert {
-        left: 10px;
-        right: 10px;
-        min-width: auto;
-    }
-}
-
-@media (max-width: 480px) {
-    .main-container, .dashboard-container {
-        padding: 10px;
-    }
-
-    .form-container {
-        padding: 15px;
-    }
-
-    .btn {
-        padding: 10px 16px;
-        font-size: 14px;
-    }
-
-    .sidebar-menu a {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-    }
-
-    .checkbox-group {
-        gap: 10px;
-    }
-
-    .field-compact {
-        grid-template-columns: 1fr;
-    }
-
-    /* Centralização dos títulos */
-.page-header {
-    display: flex;
-    justify-content: center;
-    text-align: center;
-}
-
-.page-header h1 {
-    margin: 0;
-    width: 100%;
-}
-
 /* ===== ESTILOS PARA SISTEMA DE VISTORIAS - ATUALIZADO ===== */
 
-/* Upload Area */
+/* Upload Area GRANDE */
 .upload-area {
-    border: 2px dashed #ddd;
-    border-radius: 8px;
-    padding: 30px 20px;
+    border: 4px dashed #007bff;
+    border-radius: 20px;
+    padding: 50px 30px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
     background: #f8f9fa;
-    margin-bottom: 15px;
+    margin: 25px 0;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .upload-area:hover, .upload-area.dragover {
-    border-color: #007bff;
+    border-color: #0056b3;
     background: #e3f2fd;
+    transform: scale(1.02);
 }
 
 .upload-content i {
-    font-size: 48px;
-    color: #6c757d;
-    margin-bottom: 10px;
+    font-size: 4rem;
+    color: #007bff;
+    margin-bottom: 20px;
     display: block;
 }
 
 .upload-content p {
-    margin: 0 0 5px 0;
-    font-weight: 500;
+    margin: 0 0 15px 0;
+    font-weight: 600;
+    font-size: 1.4rem;
 }
 
 .upload-content small {
     color: #6c757d;
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 5px;
 }
 
 /* Grid de Fotos em Quadradinhos Pequenos */
@@ -1146,8 +1034,168 @@ textarea.form-control {
     text-overflow: ellipsis;
 }
 
-/* Responsividade */
+/* Estilos para a lista simplificada de vistorias - SEM FOTOS */
+.search-bar {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 20px;
+}
+
+.vistoria-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.vistoria-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #007bff;
+    transform: translateY(-2px);
+}
+
+.vistoria-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.vistoria-item-info {
+    flex: 1;
+}
+
+.vistoria-endereco {
+    color: #2c3e50;
+    margin-bottom: 12px;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.vistoria-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.vistoria-meta span {
+    font-size: 0.95em;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vistoria-observacoes {
+    font-size: 0.95em;
+    color: #495057;
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    border-left: 4px solid #007bff;
+}
+
+.vistoria-item-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.search-info {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 0.95em;
+    color: #6c757d;
+}
+
+/* Responsivo */
 @media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        box-shadow: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .col-4, .col-6 {
+        flex: 0 0 100%;
+    }
+
+    .row {
+        margin: 0;
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .card-button, .external-link-card {
+        height: auto;
+        min-height: 120px;
+        padding: 15px 10px;
+    }
+
+    .card-icon {
+        font-size: 2.5rem;
+    }
+
+    .form-cards-section, .external-links-section {
+        margin: 20px 0;
+        padding: 15px;
+    }
+
+    .form-container {
+        padding: 20px;
+    }
+
+    .form-header {
+        padding: 20px;
+        margin: -20px -20px 20px -20px;
+    }
+
+    .form-two-columns,
+    .form-with-sidebar {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .field-address,
+    .field-personal,
+    .field-documentos {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .dropdown-content {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 300px;
+    }
+
+    .custom-alert {
+        left: 10px;
+        right: 10px;
+        min-width: auto;
+    }
+
+    /* Vistorias responsivo */
     .fotos-grid {
         grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     }
@@ -1173,93 +1221,104 @@ textarea.form-control {
     .fotos-modal-grid {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
-}
 
-/* Estilos para a lista simplificada de vistorias - SEM FOTOS */
-.search-bar {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
-
-.vistoria-item {
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-}
-
-.vistoria-item:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-color: #007bff;
-}
-
-.vistoria-item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 15px;
-}
-
-.vistoria-item-info {
-    flex: 1;
-}
-
-.vistoria-endereco {
-    color: #2c3e50;
-    margin-bottom: 8px;
-    font-size: 1.1em;
-}
-
-.vistoria-meta {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    margin-bottom: 8px;
-}
-
-.vistoria-meta span {
-    font-size: 0.9em;
-    color: #6c757d;
-}
-
-.vistoria-observacoes {
-    font-size: 0.9em;
-    color: #495057;
-    background: #f8f9fa;
-    padding: 8px;
-    border-radius: 4px;
-    margin-top: 8px;
-}
-
-.vistoria-item-actions {
-    display: flex;
-    gap: 5px;
-    flex-shrink: 0;
-}
-
-.search-info {
-    text-align: center;
-}
-
-/* Responsivo */
-@media (max-width: 768px) {
     .vistoria-item-header {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
     }
     
     .vistoria-item-actions {
-        align-self: flex-end;
+        align-self: stretch;
+        justify-content: space-between;
     }
     
     .vistoria-meta {
         flex-direction: column;
-        gap: 5px;
+        gap: 8px;
+    }
+
+    /* Upload area mobile */
+    .upload-area {
+        min-height: 200px;
+        padding: 30px 20px;
+    }
+    
+    .upload-content i {
+        font-size: 3rem;
+    }
+    
+    .upload-content p {
+        font-size: 1.2rem;
+    }
+    
+    .upload-content small {
+        font-size: 1rem;
     }
 }
-    
+
+@media (max-width: 480px) {
+    .main-container, .dashboard-container {
+        padding: 10px;
+    }
+
+    .form-container {
+        padding: 15px;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .sidebar-menu a {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .checkbox-group {
+        gap: 10px;
+    }
+
+    .field-compact {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Centralização dos títulos */
+.page-header {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.page-header h1 {
+    margin: 0;
+    width: 100%;
+}
+
+/* ===== CORREÇÃO PARA UPLOAD CLICÁVEL ===== */
+.upload-area {
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+#fotosInput {
+    position: absolute !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    cursor: pointer !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 10 !important;
+}
+
+.upload-content {
+    position: relative !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+}
+
+.upload-content * {
+    pointer-events: none !important;
 }
