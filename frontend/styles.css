@@ -1174,5 +1174,92 @@ textarea.form-control {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 }
+
+/* Estilos para a lista simplificada de vistorias - SEM FOTOS */
+.search-bar {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.vistoria-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.vistoria-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-color: #007bff;
+}
+
+.vistoria-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.vistoria-item-info {
+    flex: 1;
+}
+
+.vistoria-endereco {
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.vistoria-meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.vistoria-meta span {
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+.vistoria-observacoes {
+    font-size: 0.9em;
+    color: #495057;
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 8px;
+}
+
+.vistoria-item-actions {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.search-info {
+    text-align: center;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .vistoria-item-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .vistoria-item-actions {
+        align-self: flex-end;
+    }
+    
+    .vistoria-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
     
 }

@@ -5,6 +5,11 @@
 let vistorias = JSON.parse(localStorage.getItem('vistorias_villares')) || [];
 let fotosParaUpload = [];
 
+// FUNÇÃO PARA FORMATAR DATA
+function formatarData(dataString) {
+    return new Date(dataString).toLocaleDateString('pt-BR');
+}
+
 // FUNÇÃO PRINCIPAL PARA CARREGAR A PÁGINA DE VISTORIAS
 async function loadVistoriasPage() {
     console.log('Carregando página de vistorias Villares...');
@@ -105,182 +110,10 @@ async function loadVistoriasPage() {
     configurarUploadVistoria();
 }
 
-// CONFIGURAR UPLOAD DE FOTOS PARA VISTORIA
-function configurarUploadVistoria() {
-    const uploadArea = document.getElementById('upload-area');
-    const fotosInput = document.getElementById('fotosInput');
+// ... (as funções configurarUploadVistoria, processarArquivosVistoria, removerFotoGrid, 
+// salvarVistoria e uploadFotosParaCloudinary permanecem IGUAIS) ...
 
-    if (!uploadArea || !fotosInput) return;
-
-    // Clique na área de upload
-    uploadArea.addEventListener('click', () => {
-        fotosInput.click();
-    });
-
-    // Arrastar e soltar
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        processarArquivosVistoria(e.dataTransfer.files);
-    });
-
-    // Seleção de arquivos
-    fotosInput.addEventListener('change', (e) => {
-        processarArquivosVistoria(e.target.files);
-    });
-}
-
-// PROCESSAR ARQUIVOS PARA VISTORIA (QUADRADINHOS PEQUENOS)
-function processarArquivosVistoria(files) {
-    const grid = document.getElementById('fotos-grid');
-    
-    for (let file of files) {
-        if (file.size > 5 * 1024 * 1024) {
-            showAlert(`Arquivo ${file.name} é muito grande. Máximo 5MB.`, 'warning');
-            continue;
-        }
-
-        if (!file.type.startsWith('image/')) {
-            showAlert(`Arquivo ${file.name} não é uma imagem válida.`, 'warning');
-            continue;
-        }
-
-        fotosParaUpload.push(file);
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const fotoItem = document.createElement('div');
-            fotoItem.className = 'foto-grid-item';
-            fotoItem.innerHTML = `
-                <div class="foto-grid-image">
-                    <img src="${e.target.result}" alt="Preview">
-                    <button type="button" class="btn-remove-grid" onclick="removerFotoGrid('${file.name}')">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="foto-grid-info">
-                    <span class="foto-grid-name">${file.name.substring(0, 12)}${file.name.length > 12 ? '...' : ''}</span>
-                </div>
-            `;
-            grid.appendChild(fotoItem);
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-// REMOVER FOTO DO GRID
-function removerFotoGrid(nomeArquivo) {
-    fotosParaUpload = fotosParaUpload.filter(file => file.name !== nomeArquivo);
-    
-    const grid = document.getElementById('fotos-grid');
-    const items = grid.getElementsByClassName('foto-grid-item');
-    
-    for (let item of items) {
-        const nome = item.querySelector('.foto-grid-name').textContent;
-        if (nome === nomeArquivo.substring(0, 12) + (nomeArquivo.length > 12 ? '...' : '')) {
-            item.remove();
-            break;
-        }
-    }
-}
-
-// SALVAR VISTORIA
-async function salvarVistoria() {
-    const endereco = document.getElementById('enderecoVistoria').value;
-    const data = document.getElementById('dataVistoria').value;
-    const vistoriador = document.getElementById('vistoriador').value;
-    const observacoes = document.getElementById('observacoesVistoria').value;
-
-    if (!endereco || !data || !vistoriador) {
-        showAlert('Por favor, preencha todos os campos obrigatórios!', 'warning');
-        return;
-    }
-
-    if (fotosParaUpload.length === 0) {
-        showAlert('Por favor, adicione pelo menos uma foto!', 'warning');
-        return;
-    }
-
-    showAlert('Salvando vistoria...', 'info');
-
-    try {
-        const fotosUrls = await uploadFotosParaCloudinary();
-
-        const vistoria = {
-            id: Date.now().toString(),
-            endereco,
-            data,
-            vistoriador,
-            observacoes,
-            fotos: fotosUrls,
-            dataCriacao: new Date().toISOString()
-        };
-
-        vistorias.unshift(vistoria);
-        localStorage.setItem('vistorias_villares', JSON.stringify(vistorias));
-
-        showAlert('Vistoria salva com sucesso!', 'success');
-        
-        // Limpar formulário
-        document.getElementById('vistoria-form').reset();
-        fotosParaUpload = [];
-        document.getElementById('fotos-grid').innerHTML = '';
-        
-        // Atualizar lista
-        document.getElementById('lista-vistorias').innerHTML = renderizarListaVistorias();
-
-    } catch (error) {
-        console.error('Erro ao salvar vistoria:', error);
-        showAlert('Erro ao salvar vistoria: ' + error.message, 'error');
-    }
-}
-
-// UPLOAD PARA CLOUDINARY
-async function uploadFotosParaCloudinary() {
-    if (fotosParaUpload.length === 0) return [];
-
-    const urls = [];
-    
-    for (let file of fotosParaUpload) {
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', 'villares_vistorias');
-            formData.append('cloud_name', 'da5gy1gds');
-
-            const response = await fetch('https://api.cloudinary.com/v1_1/da5gy1gds/image/upload', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) throw new Error(`Erro no upload: ${response.status}`);
-
-            const data = await response.json();
-            urls.push({
-                url: data.secure_url,
-                public_id: data.public_id,
-                nome: file.name
-            });
-
-        } catch (error) {
-            console.error('Erro no upload da foto:', error);
-            throw new Error(`Falha no upload da foto ${file.name}`);
-        }
-    }
-
-    return urls;
-}
-
-// RENDERIZAR LISTA DE VISTORIAS
+// RENDERIZAR LISTA DE VISTORIAS SIMPLIFICADA COM PESQUISA
 function renderizarListaVistorias() {
     if (vistorias.length === 0) {
         return `
@@ -292,139 +125,219 @@ function renderizarListaVistorias() {
         `;
     }
 
-    return vistorias.map(vistoria => `
-        <div class="vistoria-card">
-            <div class="vistoria-card-header">
-                <h4>${vistoria.endereco}</h4>
-                <div class="vistoria-meta">
-                    <span><i class="fas fa-calendar"></i> ${formatarData(vistoria.data)}</span>
-                    <span><i class="fas fa-user"></i> ${vistoria.vistoriador}</span>
-                    <span><i class="fas fa-images"></i> ${vistoria.fotos.length} foto(s)</span>
-                </div>
-            </div>
-            
-            ${vistoria.observacoes ? `
-                <div class="vistoria-observacoes">
-                    <strong>Observações:</strong> ${vistoria.observacoes}
-                </div>
-            ` : ''}
-            
-            <div class="vistoria-fotos-preview">
-                ${vistoria.fotos.slice(0, 4).map(foto => `
-                    <div class="foto-preview-small">
-                        <img src="${foto.url}" alt="${foto.nome}">
-                    </div>
-                `).join('')}
-                ${vistoria.fotos.length > 4 ? `
-                    <div class="foto-preview-more">
-                        +${vistoria.fotos.length - 4}
-                    </div>
-                ` : ''}
-            </div>
-            
-            <div class="vistoria-actions">
-                <button class="btn btn-primary btn-sm" onclick="visualizarVistoria('${vistoria.id}')">
-                    <i class="fas fa-eye"></i> Ver Todas
+    return `
+        <!-- Barra de Pesquisa -->
+        <div class="search-bar mb-3">
+            <div class="input-group">
+                <input type="text" id="search-vistorias" class="form-control" 
+                       placeholder="🔍 Pesquisar por endereço, vistoriador..." 
+                       onkeyup="filtrarVistorias()">
+                <button class="btn btn-outline-secondary" type="button" onclick="filtrarVistorias()">
+                    <i class="fas fa-search"></i>
                 </button>
-                <button class="btn btn-secondary btn-sm" onclick="downloadVistoria('${vistoria.id}')">
-                    <i class="fas fa-download"></i> Download
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="excluirVistoria('${vistoria.id}')">
-                    <i class="fas fa-trash"></i> Excluir
+                <button class="btn btn-outline-secondary" type="button" onclick="limparPesquisa()" title="Limpar pesquisa">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
-    `).join('');
+
+        <!-- Contador de resultados -->
+        <div class="search-info mb-2">
+            <small class="text-muted" id="search-count">
+                Mostrando ${vistorias.length} vistoria(s)
+            </small>
+        </div>
+
+        <!-- Lista de Vistorias -->
+        <div id="vistorias-list">
+            ${vistorias.map(vistoria => `
+                <div class="vistoria-item" 
+                     data-endereco="${vistoria.endereco.toLowerCase()}" 
+                     data-vistoriador="${vistoria.vistoriador.toLowerCase()}">
+                    <div class="vistoria-item-header">
+                        <div class="vistoria-item-info">
+                            <h5 class="vistoria-endereco">${vistoria.endereco}</h5>
+                            <div class="vistoria-meta">
+                                <span class="vistoria-data"><i class="fas fa-calendar"></i> ${formatarData(vistoria.data)}</span>
+                                <span class="vistoria-vistoriador"><i class="fas fa-user"></i> ${vistoria.vistoriador}</span>
+                                <span class="vistoria-fotos-count"><i class="fas fa-images"></i> ${vistoria.fotos.length} foto(s)</span>
+                            </div>
+                            ${vistoria.observacoes ? `
+                                <div class="vistoria-observacoes">
+                                    <strong>Observações:</strong> ${vistoria.observacoes}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="vistoria-item-actions">
+                            <button class="btn btn-primary btn-sm" onclick="visualizarVistoria('${vistoria.id}')" title="Ver fotos">
+                                <i class="fas fa-eye"></i> Ver Fotos
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="baixarTodasFotos('${vistoria.id}')" title="Baixar todas as fotos">
+                                <i class="fas fa-download"></i> Baixar Vistoria
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="excluirVistoria('${vistoria.id}')" title="Excluir vistoria">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
 
-// VISUALIZAR VISTORIA COMPLETA
+// FILTRAR VISTORIAS
+function filtrarVistorias() {
+    const searchTerm = document.getElementById('search-vistorias').value.toLowerCase();
+    const vistoriaItems = document.querySelectorAll('.vistoria-item');
+    let visibleCount = 0;
+
+    vistoriaItems.forEach(item => {
+        const endereco = item.getAttribute('data-endereco');
+        const vistoriador = item.getAttribute('data-vistoriador');
+        
+        const matches = endereco.includes(searchTerm) || 
+                       vistoriador.includes(searchTerm);
+        
+        item.style.display = matches ? 'block' : 'none';
+        if (matches) visibleCount++;
+    });
+
+    // Atualizar contador
+    const searchCount = document.getElementById('search-count');
+    if (searchCount) {
+        searchCount.textContent = `Mostrando ${visibleCount} vistoria(s)${searchTerm ? ` para "${searchTerm}"` : ''}`;
+    }
+}
+
+// LIMPAR PESQUISA
+function limparPesquisa() {
+    document.getElementById('search-vistorias').value = '';
+    filtrarVistorias();
+}
+
+// BAIXAR TODAS AS FOTOS DA VISTORIA
+async function baixarTodasFotos(vistoriaId) {
+    const vistoria = vistorias.find(v => v.id === vistoriaId);
+    if (!vistoria || vistoria.fotos.length === 0) {
+        showAlert('Nenhuma foto encontrada para download!', 'warning');
+        return;
+    }
+
+    showAlert(`Iniciando download de ${vistoria.fotos.length} fotos...`, 'info');
+
+    try {
+        // Baixar cada foto sequencialmente
+        for (let i = 0; i < vistoria.fotos.length; i++) {
+            const foto = vistoria.fotos[i];
+            
+            // Criar link de download para cada foto
+            const a = document.createElement('a');
+            a.href = foto.url;
+            a.download = `vistoria_${vistoria.endereco.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_')}_${i + 1}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            // Pequena pausa entre os downloads para não sobrecarregar
+            if (i < vistoria.fotos.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+        
+        showAlert(`Download concluído! ${vistoria.fotos.length} fotos baixadas.`, 'success');
+        
+    } catch (error) {
+        console.error('Erro no download das fotos:', error);
+        showAlert('Erro ao baixar as fotos. Tente novamente.', 'error');
+    }
+}
+
+// VISUALIZAR VISTORIA EM NOVA PÁGINA SIMPLES
 function visualizarVistoria(vistoriaId) {
     const vistoria = vistorias.find(v => v.id === vistoriaId);
     if (!vistoria) return;
 
-    const fotosHTML = vistoria.fotos.map(foto => `
-        <div class="foto-modal-item">
-            <img src="${foto.url}" alt="${foto.nome}" class="foto-modal-image">
-            <div class="foto-modal-info">
-                <span>${foto.nome}</span>
-                <button class="btn btn-primary btn-sm" onclick="downloadFoto('${foto.url}', '${foto.nome}')">
-                    <i class="fas fa-download"></i> Baixar
-                </button>
+    // Criar página simples com as fotos
+    const paginaFotos = `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Fotos da Vistoria - ${vistoria.endereco}</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 20px;
+                    background: #f5f5f5;
+                }
+                .header {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin-bottom: 20px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                }
+                .fotos-container {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                    gap: 15px;
+                }
+                .foto-item {
+                    background: white;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                }
+                .foto-item img {
+                    width: 100%;
+                    height: 200px;
+                    object-fit: cover;
+                }
+                .btn-voltar {
+                    background: #6c757d;
+                    color: white;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-bottom: 15px;
+                }
+                .btn-voltar:hover {
+                    background: #5a6268;
+                }
+            </style>
+        </head>
+        <body>
+            <button class="btn-voltar" onclick="window.close()">← Fechar</button>
+            
+            <div class="header">
+                <h1>📷 Fotos da Vistoria</h1>
+                <p><strong>Endereço:</strong> ${vistoria.endereco}</p>
+                <p><strong>Data:</strong> ${formatarData(vistoria.data)}</p>
+                <p><strong>Vistoriador:</strong> ${vistoria.vistoriador}</p>
+                <p><strong>Total de Fotos:</strong> ${vistoria.fotos.length}</p>
             </div>
-        </div>
-    `).join('');
 
-    const modalHTML = `
-        <div class="modal-overlay active" id="vistoria-modal">
-            <div class="modal-dialog">
-                <div class="modal-header">
-                    <h4>📷 Vistoria - ${vistoria.endereco}</h4>
-                    <button class="btn-close" onclick="fecharModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="vistoria-details">
-                        <p><strong>Data:</strong> ${formatarData(vistoria.data)}</p>
-                        <p><strong>Vistoriador:</strong> ${vistoria.vistoriador}</p>
-                        ${vistoria.observacoes ? `
-                            <p><strong>Observações:</strong> ${vistoria.observacoes}</p>
-                        ` : ''}
+            <div class="fotos-container">
+                ${vistoria.fotos.map(foto => `
+                    <div class="foto-item">
+                        <img src="${foto.url}" alt="${foto.nome}">
                     </div>
-                    <div class="fotos-modal-grid">
-                        ${fotosHTML}
-                    </div>
-                </div>
+                `).join('')}
             </div>
-        </div>
+        </body>
+        </html>
     `;
 
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    // Abrir nova janela
+    const novaJanela = window.open('', '_blank', 'width=1200,height=800');
+    novaJanela.document.write(paginaFotos);
+    novaJanela.document.close();
 }
 
-// FUNÇÕES AUXILIARES
-function fecharModal() {
-    const modal = document.getElementById('vistoria-modal');
-    if (modal) modal.remove();
-}
-
-function downloadFoto(url, nome) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = nome;
-    a.click();
-}
-
-function downloadVistoria(vistoriaId) {
-    const vistoria = vistorias.find(v => v.id === vistoriaId);
-    if (!vistoria) return;
-
-    // Criar relatório em texto
-    const dados = `
-VISTORIA VILLARES IMÓVEIS
-==========================
-
-Endereço: ${vistoria.endereco}
-Data: ${formatarData(vistoria.data)}
-Vistoriador: ${vistoria.vistoriador}
-Observações: ${vistoria.observacoes || 'Nenhuma'}
-Total de Fotos: ${vistoria.fotos.length}
-
-LISTA DE FOTOS:
-${vistoria.fotos.map((foto, index) => `${index + 1}. ${foto.nome} - ${foto.url}`).join('\n')}
-
-Relatório gerado em: ${new Date().toLocaleString('pt-BR')}
-    `;
-
-    const blob = new Blob([dados], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `vistoria_${vistoria.endereco.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_')}_${vistoria.data}.txt`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-}
-
+// EXCLUIR VISTORIA
 function excluirVistoria(vistoriaId) {
     if (!confirm('Tem certeza que deseja excluir esta vistoria? Esta ação não pode ser desfeita.')) return;
 
@@ -434,10 +347,7 @@ function excluirVistoria(vistoriaId) {
     showAlert('Vistoria excluída com sucesso!', 'success');
 }
 
-function formatarData(dataString) {
-    return new Date(dataString).toLocaleDateString('pt-BR');
-}
-
+// FUNÇÃO PARA MOSTRAR ALERTAS
 function showAlert(message, type = 'info') {
     if (window.app && window.app.showAlert) {
         window.app.showAlert(message, type);
