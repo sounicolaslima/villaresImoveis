@@ -489,7 +489,7 @@ function coletarDadosFormulario() {
         // Dados do Locatário
         nomeLocatario: getValue('nomeLocatario'),
         RGLocatario: getValue('RGLocatario'),
-        CPFLocatario: getValue('cpf_locatario'),
+        CPFLocatario: getValue('CPFLocatario'),
         endereco: getValue('endereco'),
         valorLocacaoMensal: getValue('valorLocacao'),
         dataEntrada: getValue('dataEntrada'),
@@ -612,7 +612,7 @@ function getPipefyFieldMappingsLocacao() {
     return {
         // Dados do Locatário
         'nomeLocatario': 'nomeLocatario',
-        'CPFLocatario': 'CPFlocatario', 
+        'CPFLocatario': 'CPFLocatario', 
         'RGLocatario' :'RGLocatario' ,
         'email': 'email',
         'celular': 'celular',

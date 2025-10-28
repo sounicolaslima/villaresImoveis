@@ -1,3 +1,5 @@
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
 require('dotenv').config();
 console.log("🔍 DEBUG - Variáveis de Ambiente:");
 console.log("PIPEFY_TOKEN:", process.env.PIPEFY_TOKEN ? "✅ PRÉSENTE" : "❌ AUSENTE");

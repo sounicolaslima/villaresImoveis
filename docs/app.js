@@ -1,4 +1,4 @@
-// app.js - VERSÃO COMPLETA COM FRASES DA INTERNET + LINKS EXTERNOS + PIPEFY
+// app.js - VERSÃO COMPLETA COM FRASES DA INTERNET + LINKS EXTERNOS + PIPEFY + SISTEMA DE VISTORIAS
 console.log('🚀 Sistema Villares');
 
 class App {
@@ -459,6 +459,7 @@ function showPage(pageName) {
     if (pageContent) {
         pageContent.style.display = 'block';
         
+        // PADRÃO IDÊNTICO AOS EXISTENTES - apenas adicionando 'vistorias'
         const pageLoaders = {
             'cadastro-imovel': () => loadCadastroImovelPage(),
             'recibo-aluguel': () => loadReciboAluguelPage(),
@@ -466,7 +467,8 @@ function showPage(pageName) {
             'contrato-locacao': () => loadContratoLocacaoPage(),
             'contrato-administracao': () => loadContratoAdministracaoPage(),
             'ficha-cadastral': () => loadFichaCadastralPage(),
-            'gestao-condominios': () => loadGestaoCondominiosPage()
+            'gestao-condominios': () => loadGestaoCondominiosPage(),
+            'vistorias': () => loadVistoriasPage()
         };
 
         if (pageLoaders[pageName]) {
