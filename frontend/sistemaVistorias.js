@@ -257,7 +257,7 @@ async function uploadFotosParaCloudinary() {
             formData.append('upload_preset', 'villares_vistorias');
             formData.append('cloud_name', 'da5gy1gds');
 
-            const response = await fetch('https://api.cloudinary.com/v1_1/villaresimoveis/image/upload', {
+            const response = await fetch('https://api.cloudinary.com/v1_1/da5gy1gds/image/upload', {
                 method: 'POST',
                 body: formData
             });
