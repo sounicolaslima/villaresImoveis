@@ -7,7 +7,7 @@ COPY backend/package*.json ./
 RUN npm install
 
 COPY backend/ ./backend/
-COPY public/ ./public/ 
+COPY frontend/ ./frontend/
 COPY templates/ ./templates/
 
 WORKDIR /app/backend
