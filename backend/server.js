@@ -295,10 +295,10 @@ app.post('/api/gerar-documento/termo-vistoria', async (req, res) => {
 
 app.post('/api/gerar-documento/gestaodecondominio', async (req, res) => {
     try {
-        await gerarDocumento('condominios.docx', req.body, res, 'Relatorio_Financeiro_Condominio.docx');
+        await gerarDocumento('condominios.docx', req.body, res, 'Relatorio_Condominio.docx');
     } catch (error) {
         console.error('❌ Erro ao gerar relatório de condomínio:', error);
-        res.status(500).json({ error: 'Erro ao gerar relatório de condomínio: ' + error.message });
+        res.status(500).json({ error: 'Erro ao gerar relatório de condomínio' });
     }
 });
 
@@ -330,6 +330,8 @@ app.get('/api/verificar-templates', (req, res) => {
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
+
+
 
 // INICIAR SERVIDOR
 const PORT = process.env.PORT || 3000;

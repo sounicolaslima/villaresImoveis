@@ -41,7 +41,7 @@ async function loadTermoVistoriaPage() {
                         <div class="col-4">
                             <div class="form-group">
                                 <label>RG</label>
-                                <input type="text" id="RG" class="form-control" placeholder="00.000.000-0">
+                                <input type="text" id="RGLocatario" class="form-control" placeholder="00.000.000-0">
                             </div>
                         </div>
                         <div class="col-4">
@@ -56,7 +56,7 @@ async function loadTermoVistoriaPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Endereço do Locatário</label>
-                                <input type="text" id="endereco" class="form-control" placeholder="Rua, número, bairro">
+                                <input type="text" id="enderecoLocatario" class="form-control" placeholder="Rua, número, bairro">
                             </div>
                         </div>
                         <div class="col-6">
@@ -138,7 +138,7 @@ async function loadTermoVistoriaPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Testemunha 1</label>
-                                <input type="text" id="TESTEMUNHA1" class="form-control" placeholder="Nome completo">
+                                <input type="text" id="nomeTestemunha1" class="form-control" placeholder="Nome completo">
                             </div>
                         </div>
                         <div class="col-6">
@@ -153,7 +153,7 @@ async function loadTermoVistoriaPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Testemunha 2</label>
-                                <input type="text" id="TESTEMUNHA2" class="form-control" placeholder="Nome completo">
+                                <input type="text" id="nomeTestemunha2" class="form-control" placeholder="Nome completo">
                             </div>
                         </div>
                         <div class="col-6">
@@ -269,9 +269,19 @@ function adicionarFiadorVistoria() {
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label>Endereço</label>
-                <input type="text" id="fiadorEndereco${fiadoresVistoriaCount}" class="form-control" placeholder="Endereço completo">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>Endereço</label>
+                        <input type="text" id="fiadorEndereco${fiadoresVistoriaCount}" class="form-control" placeholder="Endereço completo">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" id="fiadorEmail${fiadoresVistoriaCount}" class="form-control" placeholder="email@exemplo.com">
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -386,20 +396,19 @@ function removerCaracteristicaComodo(comodoIndex, caracIndex) {
     }
 }
 
-// FUNÇÃO PARA GERAR TERMO DE VISTORIA
+// FUNÇÃO PARA GERAR TERMO DE VISTORIA - COM DEBUG DO SERVIDOR
 async function gerarTermoVistoria() {
     console.log('Gerando termo de vistoria...');
 
     try {
         const dadosForm = coletarDadosVistoriaFormulario();
 
-        // ESTRUTURA SIMPLES - IGUAL AOS FIADORES
+        // ESTRUTURA CORRETA PARA O TEMPLATE
         const dadosParaTemplate = {
-            // ... (mantenha todos os outros campos igual)
             nomeLocatario: dadosForm.nomeLocatario,
-            RGLocatario: dadosForm.RG,
+            RGLocatario: dadosForm.RGLocatario,
             CPFLocatario: dadosForm.CPFLocatario,
-            enderecoLocatario: dadosForm.endereco,
+            enderecoLocatario: dadosForm.enderecoLocatario,
             celular: dadosForm.celular,
             email: dadosForm.email,
             enderecoImovel: dadosForm.enderecoImovel,
@@ -409,51 +418,59 @@ async function gerarTermoVistoria() {
             dia: dadosForm.dia,
             mes: dadosForm.mes,
             ano: dadosForm.ano,
-            nomeTestemunha1: dadosForm.TESTEMUNHA1,
+            nomeTestemunha1: dadosForm.nomeTestemunha1,
             CPFTestemunha1: dadosForm.CPFTestemunha1,
-            nomeTestemunha2: dadosForm.TESTEMUNHA2,
+            nomeTestemunha2: dadosForm.nomeTestemunha2,
             CPFTestemunha2: dadosForm.CPFTestemunha2,
             
-            // FIADORES - formato que funciona
-            fiadores: dadosForm.fiadores,
+            fiadores: dadosForm.fiadores.map(fiador => ({
+                nomeFiador: fiador.nomeFiador,
+                RGFiador: fiador.RGFiador,
+                CPFFiador: fiador.CPFFiador,
+                enderecoFiador: fiador.enderecoFiador,
+                celularFiador: fiador.celularFiador,
+                emailFiador: fiador.emailFiador
+            })),
             
-            // CÔMODOS - MESMO FORMATO DOS FIADORES: array de strings
-            comodos: dadosForm.comodos.map(comodo => {
-                // Formatar igual aos fiadores - APENAS STRINGS
-                const caracteristicasStr = comodo.caracteristicas.map(carac => 
-                    `${carac.nome} - ${carac.estado} - ${carac.descricao}`
-                ).join(' | ');
-                
-                return `CÔMODO: ${comodo.nome} | CARACTERÍSTICAS: ${caracteristicasStr}`;
-            })
+            comodos: dadosForm.comodos.map(comodo => ({
+                NOMECOMODO: comodo.nome.toUpperCase(),
+                caracteristicas: comodo.caracteristicas.map(carac => ({
+                    nome: carac.nome,
+                    estado: carac.estado,
+                    descricao: carac.descricao
+                }))
+            }))
         };
 
-        console.log('🎯 DADOS ENVIADOS:');
-        console.log('Fiadores:', dadosParaTemplate.fiadores);
-        console.log('Cômodos:', dadosParaTemplate.comodos);
+        console.log('🎯 DADOS ENVIADOS PARA O TEMPLATE:', dadosParaTemplate);
 
-        // ... resto do código igual
-        const response = await fetch('/api/gerar-documento/termo-vistoria', {
+        // DEBUG DA CONEXÃO
+        const urlAPI = '/api/gerar-documento/termo-vistoria';
+        console.log('🔗 Tentando acessar:', urlAPI);
+        console.log('📍 URL completa:', window.location.origin + urlAPI);
+
+        // ENVIAR PARA O SERVIDOR
+        console.log('📤 Enviando dados para o servidor...');
+        const response = await fetch(urlAPI, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(dadosParaTemplate)
         });
 
+        console.log('📡 Status da resposta:', response.status);
+        console.log('📡 Status text:', response.statusText);
+
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Erro no servidor: ${response.status} - ${errorText}`);
+            console.error('❌ Erro do servidor:', errorText);
+            throw new Error(`Servidor retornou erro ${response.status}: ${errorText}`);
         }
 
         const blob = await response.blob();
+        console.log('✅ Documento gerado com sucesso! Tamanho:', blob.size, 'bytes');
 
-        if (blob.size === 0) {
-            throw new Error('Arquivo vazio recebido do servidor');
-        }
-
-        console.log('✅ Documento gerado com sucesso!');
-
+        // DOWNLOAD
         const url = window.URL.createObjectURL(blob);
-
         const downloadBtn = document.getElementById('download-btn-vistoria');
         if (downloadBtn) {
             downloadBtn.onclick = () => {
@@ -484,122 +501,92 @@ async function gerarTermoVistoria() {
     }
 }
 
-// FUNÇÃO ÚNICA PARA COLETAR DADOS DO FORMULÁRIO VISTORIA - CORRIGIDA
+// FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO - CORRIGIDA
 function coletarDadosVistoriaFormulario() {
     const dados = {
-        // Dados do Locatário
         nomeLocatario: document.getElementById('nomeLocatario')?.value || "",
-        RG: document.getElementById('RG')?.value || "",
+        RGLocatario: document.getElementById('RGLocatario')?.value || "",
         CPFLocatario: document.getElementById('CPFLocatario')?.value || "",
-        endereco: document.getElementById('endereco')?.value || "",
+        enderecoLocatario: document.getElementById('enderecoLocatario')?.value || "",
         celular: document.getElementById('celular')?.value || "",
         email: document.getElementById('email')?.value || "",
         enderecoImovel: document.getElementById('enderecoImovel')?.value || "",
-
-        // Datas
         dataContrato: document.getElementById('dataContrato')?.value || "",
         dataVistoria: document.getElementById('dataVistoria')?.value || "",
         nomeVistoriador: document.getElementById('nomeVistoriador')?.value || "",
         dia: document.getElementById('dia')?.value || "",
         mes: document.getElementById('mes')?.value || "",
         ano: document.getElementById('ano')?.value || "",
-
-        // Testemunhas
-        TESTEMUNHA1: document.getElementById('TESTEMUNHA1')?.value || "",
+        nomeTestemunha1: document.getElementById('nomeTestemunha1')?.value || "",
         CPFTestemunha1: document.getElementById('CPFTestemunha1')?.value || "",
-        TESTEMUNHA2: document.getElementById('TESTEMUNHA2')?.value || "",
+        nomeTestemunha2: document.getElementById('nomeTestemunha2')?.value || "",
         CPFTestemunha2: document.getElementById('CPFTestemunha2')?.value || "",
-
-        // Fiadores
         fiadores: [],
-
-        // Cômodos
         comodos: []
     };
 
-    console.log('🔍 INICIANDO COLETA DE FIADORES...');
-
-    // Coletar fiadores
+    console.log('🔍 COLETANDO FIADORES...');
     for (let i = 1; i < fiadoresVistoriaCount; i++) {
         const fiadorElement = document.getElementById(`fiador-vistoria-${i}`);
-        console.log(`Verificando fiador ${i}:`, fiadorElement);
-        
         if (fiadorElement && fiadorElement.offsetParent !== null) {
             const nome = document.getElementById(`fiadorNome${i}`)?.value || "";
             const cpf = document.getElementById(`fiadorCPF${i}`)?.value || "";
             const rg = document.getElementById(`fiadorRG${i}`)?.value || "";
             const telefone = document.getElementById(`fiadorTelefone${i}`)?.value || "";
             const endereco = document.getElementById(`fiadorEndereco${i}`)?.value || "";
-
-            console.log(`Fiador ${i} dados:`, { nome, cpf, rg, telefone, endereco });
+            const email = document.getElementById(`fiadorEmail${i}`)?.value || "";
 
             if (nome.trim()) {
-                const fiadorString = `FIADOR(A): ${nome}\nRG: ${rg} CPF: ${cpf}\nENDEREÇO: ${endereco}\nCELULAR: ${telefone} E-MAIL: `;
-                dados.fiadores.push(fiadorString);
-                console.log(`✅ Fiador ${i} adicionado:`, fiadorString);
+                dados.fiadores.push({
+                    nomeFiador: nome,
+                    RGFiador: rg,
+                    CPFFiador: cpf,
+                    enderecoFiador: endereco,
+                    celularFiador: telefone,
+                    emailFiador: email
+                });
             }
         }
     }
 
-    console.log('🔍 INICIANDO COLETA DE CÔMODOS...');
-
-    // Coletar cômodos e características
+    console.log('🔍 COLETANDO CÔMODOS...');
     for (let i = 1; i <= comodosCount; i++) {
         const comodoElement = document.getElementById(`comodo-${i}`);
-        console.log(`Verificando cômodo ${i}:`, comodoElement);
-        
         if (comodoElement && comodoElement.offsetParent !== null) {
             const comodoNome = document.getElementById(`comodoNome${i}`)?.value || "";
-            console.log(`Cômodo ${i} nome:`, comodoNome);
-            
             if (comodoNome.trim()) {
-                const comodo = {
-                    nome: comodoNome,
-                    caracteristicas: []
-                };
+                const caracteristicas = [];
+                let j = 1;
+                while (true) {
+                    const nomeInput = document.getElementById(`comodo${i}carac${j}nome`);
+                    const estadoSelect = document.getElementById(`comodo${i}carac${j}estado`);
+                    const descInput = document.getElementById(`comodo${i}carac${j}desc`);
+                    
+                    // Verifica se o elemento existe
+                    if (!nomeInput || !nomeInput.offsetParent) break;
+                    
+                    const caracNome = nomeInput.value || "";
+                    const caracEstado = estadoSelect?.value || 'Bom';
+                    const caracDesc = descInput?.value || "";
 
-                // Coletar características do cômodo
-                const container = document.getElementById(`caracteristicas-comodo-${i}`);
-                console.log(`Container do cômodo ${i}:`, container);
-                
-                if (container) {
-                    // PEGA TODOS OS INPUTS DIRETAMENTE
-                    const inputsNome = container.querySelectorAll('input[id*="nome"]');
-                    const selectsEstado = container.querySelectorAll('select[id*="estado"]');
-                    const inputsDesc = container.querySelectorAll('input[id*="desc"]');
-
-                    console.log(`Características encontradas no cômodo ${i}:`, {
-                        nomes: inputsNome.length,
-                        estados: selectsEstado.length, 
-                        descs: inputsDesc.length
-                    });
-
-                    // Para cada característica
-                    for (let j = 0; j < inputsNome.length; j++) {
-                        const caracNome = inputsNome[j]?.value || "";
-                        const caracEstado = selectsEstado[j]?.value || 'Bom';
-                        const caracDesc = inputsDesc[j]?.value || "";
-
-                        console.log(`Característica ${j+1}:`, { caracNome, caracEstado, caracDesc });
-
-                        if (caracNome.trim()) {
-                            comodo.caracteristicas.push({
-                                nome: caracNome,
-                                estado: caracEstado,
-                                descricao: caracDesc
-                            });
-                            console.log(`✅ Característica ${j+1} adicionada`);
-                        }
+                    if (caracNome.trim()) {
+                        caracteristicas.push({ 
+                            nome: caracNome, 
+                            estado: caracEstado, 
+                            descricao: caracDesc 
+                        });
                     }
+                    j++;
                 }
-
-                dados.comodos.push(comodo);
-                console.log(`✅ Cômodo ${i} adicionado:`, comodo);
+                dados.comodos.push({ 
+                    nome: comodoNome, 
+                    caracteristicas: caracteristicas 
+                });
             }
         }
     }
 
-    console.log('📋 DADOS FINAIS COLETADOS:', {
+    console.log('📋 DADOS COLETADOS:', {
         fiadores: dados.fiadores.length,
         comodos: dados.comodos.length,
         comodosDetalhes: dados.comodos
@@ -613,9 +600,7 @@ async function loadPipefyDataVistoria() {
     try {
         const loading = document.getElementById('loading');
         const cards = await window.app.loadPipefyCards();
-
         if (loading) loading.classList.add('hidden');
-
         if (cards.length > 0) {
             const selectorContainer = document.getElementById('pipefy-selector');
             if (selectorContainer) {
@@ -635,26 +620,33 @@ async function loadPipefyDataVistoria() {
 // PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
 function fillVistoriaFormWithCardData(cardData) {
     console.log('🎯 Preenchendo vistoria com dados do Pipefy...');
-    
     const dados = cardData.dadosPreenchidos;
     let camposPreenchidos = 0;
 
-    Object.keys(dados).forEach(campo => {
-        const valor = dados[campo];
-        const input = document.getElementById(campo);
-        
+    // Mapeamento de campos do Pipefy para IDs do formulário
+    const fieldMapping = {
+        'nomeLocatario': 'nomeLocatario',
+        'RGLocatario': 'RGLocatario',
+        'CPFLocatario': 'CPFLocatario',
+        'enderecoLocatario': 'enderecoLocatario',
+        'celular': 'celular',
+        'email': 'email',
+        'enderecoImovel': 'enderecoImovel'
+    };
+
+    Object.keys(fieldMapping).forEach(pipefyField => {
+        const formFieldId = fieldMapping[pipefyField];
+        const valor = dados[pipefyField];
+        const input = document.getElementById(formFieldId);
         if (input && valor && valor !== "") {
             input.value = valor;
             camposPreenchidos++;
-            console.log(`✅ ${campo}: ${valor}`);
         }
     });
 
     console.log(`🎉 ${camposPreenchidos} campos preenchidos na vistoria`);
-    
     if (camposPreenchidos > 0 && window.app && window.app.showAlert) {
         window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente!`, 'success');
     }
-    
     return camposPreenchidos;
 }
