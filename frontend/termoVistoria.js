@@ -632,6 +632,7 @@ function fillVistoriaFormWithCardData(cardData) {
         'celular': 'celular',
         'email': 'email',
         'enderecoImovel': 'enderecoImovel'
+        
     };
 
     Object.keys(fieldMapping).forEach(pipefyField => {

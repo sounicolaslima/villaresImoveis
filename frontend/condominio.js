@@ -44,19 +44,19 @@ async function loadRelatorioPage() {
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Número da Unidade</label>
-                                <input type="text" id="unidade" class="form-control" placeholder="Ex: 101" value="101">
+                                <input type="text" id="unidade" class="form-control" placeholder="Ex: 101">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>Quantidade de Unidades</label>
+                                <input type="number" id="quantidadeUnidades" class="form-control" placeholder="Ex: 10" value="1" min="1">
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Mês/Ano das Despesas</label>
-                                <input type="text" id="mesAnoDespesas" class="form-control" placeholder="Ex: OUTUBRO DE 2025" value="${new Date().toLocaleDateString('pt-BR', {month: 'long', year: 'numeric'}).toUpperCase()}">
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="form-group">
-                                <label>Data de Vencimento</label>
-                                <input type="text" id="vencimento" class="form-control" placeholder="dd/mm/aaaa" value="${new Date(new Date().getFullYear(), new Date().getMonth() + 1, 10).toLocaleDateString('pt-BR')}">
+                                <input type="text" id="mesAnoDespesas" class="form-control" placeholder="Ex: OUTUBRO DE 2025">
                             </div>
                         </div>
                     </div>
@@ -64,17 +64,26 @@ async function loadRelatorioPage() {
                     <div class="row">
                         <div class="col-4">
                             <div class="form-group">
+                                <label>Data de Vencimento</label>
+                                <input type="text" id="vencimento" class="form-control" placeholder="dd/mm/aaaa">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
                                 <label>Período de Referência</label>
-                                <input type="text" id="periodoReferencia" class="form-control" placeholder="mm/aaaa" value="${new Date().toLocaleDateString('pt-BR', {month: '2-digit', year: 'numeric'})}">
+                                <input type="text" id="periodoReferencia" class="form-control" placeholder="mm/aaaa">
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Data de Emissão</label>
-                                <input type="text" id="dataEmissao" class="form-control" value="${new Date().toLocaleDateString('pt-BR')}">
+                                <input type="text" id="dataEmissao" class="form-control" placeholder="dd/mm/aaaa">
                             </div>
                         </div>
-                        <div class="col-4">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
                             <div class="form-group">
                                 <label>Responsável</label>
                                 <input type="text" id="responsavel" class="form-control" placeholder="Nome do responsável">
@@ -135,6 +144,12 @@ async function loadRelatorioPage() {
                                 <input type="text" id="totaldespesas" class="form-control" value="0,00" readonly style="background-color: #e9ecef; font-weight: bold;">
                             </div>
                         </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Despesa por Unidade (R$):</label>
+                                <input type="text" id="despesaPorUnidade" class="form-control" value="0,00" readonly style="background-color: #e9ecef; font-weight: bold;">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="section-header">
@@ -173,14 +188,19 @@ async function loadRelatorioPage() {
 
                     <!-- Botões -->
                     <div class="row mt-3">
-                        <div class="col-6">
+                        <div class="col-4">
                             <button type="button" class="btn btn-secondary btn-block" onclick="visualizarRelatorio()">
-                                👁️ Visualizar Relatório
+                                👁️ Visualizar
                             </button>
                         </div>
-                        <div class="col-6">
-                            <button type="button" class="btn btn-primary btn-block" onclick="gerarRelatorio()">
-                                📊 Gerar Relatório
+                        <div class="col-4">
+                            <button type="button" class="btn btn-info btn-block" onclick="gerarRelatorioTemplate()">
+                                📊 Gerar Template
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary btn-block" onclick="gerarRelatorioVisualizacao()">
+                                🎨 Gerar Visualização
                             </button>
                         </div>
                     </div>
@@ -198,6 +218,7 @@ async function loadRelatorioPage() {
                                 <p><strong>Condomínio:</strong> <span id="preview-nomecondominio"></span></p>
                                 <p><strong>Endereço:</strong> <span id="preview-enderecoCondominio"></span></p>
                                 <p><strong>Unidade:</strong> <span id="preview-unidade"></span></p>
+                                <p><strong>Quantidade de Unidades:</strong> <span id="preview-quantidadeUnidades"></span></p>
                                 <p><strong>Mês/Ano:</strong> <span id="preview-mesAnoDespesas"></span></p>
                                 <p><strong>Vencimento:</strong> <span id="preview-vencimento"></span></p>
                                 <p><strong>Data Emissão:</strong> <span id="preview-dataEmissao"></span></p>
@@ -212,6 +233,7 @@ async function loadRelatorioPage() {
                                 <p><strong>Honorários:</strong> R$ <span id="preview-honorarios">0,00</span></p>
                                 <p><strong>Tarifas:</strong> R$ <span id="preview-valortarifas">0,00</span></p>
                                 <p class="alert alert-warning"><strong>Total Despesas:</strong> R$ <span id="preview-totaldespesas">0,00</span></p>
+                                <p class="alert alert-info"><strong>Despesa por Unidade:</strong> R$ <span id="preview-despesaPorUnidade">0,00</span></p>
                                 
                                 <h4>Outros Valores:</h4>
                                 <p><strong>Aluguel:</strong> R$ <span id="preview-valorAluguel">0,00</span></p>
@@ -222,7 +244,7 @@ async function loadRelatorioPage() {
                         </div>
 
                         <div class="alert alert-info mt-3">
-                            <strong>Verifique os dados acima. Se estiverem corretos, clique em 'Gerar Relatório' para criar o arquivo Word.</strong>
+                            <strong>Escolha o formato de geração acima: Template padrão ou Visualização formatada.</strong>
                         </div>
                     </div>
                 </div>
@@ -254,6 +276,10 @@ async function loadRelatorioPage() {
                     <div class="form-group">
                         <label>Endereço Completo</label>
                         <textarea id="modalEnderecoCondominio" class="form-control" rows="3" placeholder="Digite o endereço completo"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade de Unidades</label>
+                        <input type="number" id="modalQuantidadeUnidades" class="form-control" placeholder="Quantidade total de unidades" min="1" value="1">
                     </div>
                     
                     <div class="section-header">
@@ -304,7 +330,8 @@ function carregarCondominios() {
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <strong>${cond.nome}</strong><br>
-                        <small class="text-muted">${cond.endereco}</small>
+                        <small class="text-muted">${cond.endereco}</small><br>
+                        <small class="text-muted">${cond.quantidadeUnidades || 1} unidades</small>
                     </div>
                     <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarCondominio(${index})">Editar</button>
                 </div>
@@ -323,7 +350,9 @@ function abrirModalCondominio() {
     document.getElementById('modalCondominio').classList.remove('hidden');
     document.getElementById('modalNomeCondominio').value = '';
     document.getElementById('modalEnderecoCondominio').value = '';
+    document.getElementById('modalQuantidadeUnidades').value = '1';
     document.getElementById('btnExcluir').style.display = 'none';
+    document.getElementById('btnExcluir').removeAttribute('data-index');
     carregarCondominios();
 }
 
@@ -336,6 +365,7 @@ function fecharModalCondominio() {
 function salvarCondominio() {
     const nome = document.getElementById('modalNomeCondominio').value.trim();
     const endereco = document.getElementById('modalEnderecoCondominio').value.trim();
+    const quantidadeUnidades = parseInt(document.getElementById('modalQuantidadeUnidades').value) || 1;
     
     if (!nome || !endereco) {
         alert('Por favor, preencha todos os campos!');
@@ -346,10 +376,10 @@ function salvarCondominio() {
     
     if (indexEditando !== null) {
         // Editando
-        condominios[indexEditando] = { nome, endereco };
+        condominios[indexEditando] = { nome, endereco, quantidadeUnidades };
     } else {
         // Novo condomínio
-        condominios.push({ nome, endereco });
+        condominios.push({ nome, endereco, quantidadeUnidades });
     }
     
     // Salvar no localStorage
@@ -368,6 +398,7 @@ function editarCondominio(index) {
     
     document.getElementById('modalNomeCondominio').value = condominio.nome;
     document.getElementById('modalEnderecoCondominio').value = condominio.endereco;
+    document.getElementById('modalQuantidadeUnidades').value = condominio.quantidadeUnidades || 1;
     document.getElementById('btnExcluir').style.display = 'inline-block';
     document.getElementById('btnExcluir').setAttribute('data-index', index);
     
@@ -377,6 +408,8 @@ function editarCondominio(index) {
 // EXCLUIR CONDOMÍNIO
 function excluirCondominio() {
     const index = document.getElementById('btnExcluir').getAttribute('data-index');
+    
+    if (index === null) return;
     
     if (confirm('Tem certeza que deseja excluir este condomínio?')) {
         condominios.splice(index, 1);
@@ -395,13 +428,28 @@ function setupRelatorioEventListeners() {
         selectCondominio.addEventListener('change', function() {
             const condominioSelecionado = condominios.find(cond => cond.nome === this.value);
             const enderecoInput = document.getElementById('enderecoCondominio');
+            const quantidadeInput = document.getElementById('quantidadeUnidades');
             
-            if (condominioSelecionado && enderecoInput) {
-                enderecoInput.value = condominioSelecionado.endereco;
+            if (condominioSelecionado) {
+                if (enderecoInput) {
+                    enderecoInput.value = condominioSelecionado.endereco;
+                }
+                if (quantidadeInput) {
+                    quantidadeInput.value = condominioSelecionado.quantidadeUnidades || 1;
+                }
             } else {
-                enderecoInput.value = '';
+                if (enderecoInput) enderecoInput.value = '';
+                if (quantidadeInput) quantidadeInput.value = '1';
             }
+            
+            calcularTotais();
         });
+    }
+
+    // Evento para quantidade de unidades
+    const quantidadeInput = document.getElementById('quantidadeUnidades');
+    if (quantidadeInput) {
+        quantidadeInput.addEventListener('input', calcularTotais);
     }
 
     // Eventos para campos monetários
@@ -461,6 +509,10 @@ function calcularTotais() {
         totalDespesas += parseFloat(valor) || 0;
     });
 
+    // Calcular despesa por unidade
+    const quantidadeUnidades = parseInt(document.getElementById('quantidadeUnidades').value) || 1;
+    const despesaPorUnidade = quantidadeUnidades > 0 ? totalDespesas / quantidadeUnidades : 0;
+
     // Calcular valor total final
     const outrosValores = ['valorAluguel', 'valorIPTU', 'valorCondominio'];
     let totalOutros = 0;
@@ -474,10 +526,15 @@ function calcularTotais() {
         totalOutros += parseFloat(valor) || 0;
     });
 
-    const valorTotalFinal = totalDespesas + totalOutros;
+    const valorTotalFinal = despesaPorUnidade + totalOutros;
 
     // Atualizar campos
     const totalDespesasFormatado = totalDespesas.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    const despesaPorUnidadeFormatado = despesaPorUnidade.toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
@@ -488,9 +545,11 @@ function calcularTotais() {
     });
 
     const totalDespesasInput = document.getElementById('totaldespesas');
+    const despesaPorUnidadeInput = document.getElementById('despesaPorUnidade');
     const totalFinalInput = document.getElementById('valorTotalFinal');
 
     if (totalDespesasInput) totalDespesasInput.value = totalDespesasFormatado;
+    if (despesaPorUnidadeInput) despesaPorUnidadeInput.value = despesaPorUnidadeFormatado;
     if (totalFinalInput) totalFinalInput.value = totalFinalFormatado;
 }
 
@@ -502,6 +561,7 @@ function visualizarRelatorio() {
     document.getElementById('preview-nomecondominio').textContent = relatorioData.nomecondominio || 'Não informado';
     document.getElementById('preview-enderecoCondominio').textContent = relatorioData.enderecoCondominio || 'Não informado';
     document.getElementById('preview-unidade').textContent = relatorioData.unidade || 'Não informado';
+    document.getElementById('preview-quantidadeUnidades').textContent = relatorioData.quantidadeUnidades || '1';
     document.getElementById('preview-mesAnoDespesas').textContent = relatorioData.mesAnoDespesas || 'Não informado';
     document.getElementById('preview-vencimento').textContent = relatorioData.vencimento || 'Não informado';
     document.getElementById('preview-dataEmissao').textContent = relatorioData.dataEmissao || 'Não informado';
@@ -514,6 +574,7 @@ function visualizarRelatorio() {
     document.getElementById('preview-honorarios').textContent = relatorioData.honorarios || '0,00';
     document.getElementById('preview-valortarifas').textContent = relatorioData.valortarifas || '0,00';
     document.getElementById('preview-totaldespesas').textContent = relatorioData.totaldespesas || '0,00';
+    document.getElementById('preview-despesaPorUnidade').textContent = relatorioData.despesaPorUnidade || '0,00';
     document.getElementById('preview-valorAluguel').textContent = relatorioData.valorAluguel || '0,00';
     document.getElementById('preview-valorIPTU').textContent = relatorioData.valorIPTU || '0,00';
     document.getElementById('preview-valorCondominio').textContent = relatorioData.valorCondominio || '0,00';
@@ -534,6 +595,7 @@ function collectRelatorioFormData() {
         nomecondominio: getValue('nomecondominio'),
         enderecoCondominio: getValue('enderecoCondominio'),
         unidade: getValue('unidade'),
+        quantidadeUnidades: getValue('quantidadeUnidades'),
         mesAnoDespesas: getValue('mesAnoDespesas'),
         vencimento: getValue('vencimento'),
         periodoReferencia: getValue('periodoReferencia'),
@@ -546,6 +608,7 @@ function collectRelatorioFormData() {
         honorarios: getValue('honorarios'),
         valortarifas: getValue('valortarifas'),
         totaldespesas: getValue('totaldespesas'),
+        despesaPorUnidade: getValue('despesaPorUnidade'),
         valorAluguel: getValue('valorAluguel'),
         valorIPTU: getValue('valorIPTU'),
         valorCondominio: getValue('valorCondominio'),
@@ -553,14 +616,14 @@ function collectRelatorioFormData() {
     };
 }
 
-// GERAR RELATÓRIO - CÓDIGO COMPLETO
-async function gerarRelatorio() {
+// GERAR RELATÓRIO NO FORMATO TEMPLATE (original) - DOCX
+async function gerarRelatorioTemplate() {
     try {
         if (!relatorioData || Object.keys(relatorioData).length === 0) {
             relatorioData = collectRelatorioFormData();
         }
 
-        console.log('📊 Enviando dados para gerar relatório!', relatorioData);
+        console.log('📊 Enviando dados para gerar relatório (Template)!', relatorioData);
 
         const response = await fetch('/api/gerar-documento/gestaodecondominio', {
             method: 'POST',
@@ -587,7 +650,7 @@ async function gerarRelatorio() {
             downloadBtn.onclick = () => {
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `Relatorio_Condominio_${relatorioData.nomecondominio || 'Relatorio'}_${new Date().toISOString().split("T")[0]}.docx`;
+                a.download = `Relatorio_Template_${relatorioData.nomecondominio || 'Relatorio'}_${new Date().toISOString().split("T")[0]}.docx`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -599,13 +662,292 @@ async function gerarRelatorio() {
         document.getElementById('download-section').classList.remove('hidden');
 
         if (window.app && window.app.showAlert) {
-            window.app.showAlert('Relatório gerado com sucesso!', 'success');
+            window.app.showAlert('Relatório (Template) gerado com sucesso!', 'success');
         }
 
     } catch (error) {
-        console.error('❌ Erro ao gerar relatório!', error);
+        console.error('❌ Erro ao gerar relatório (Template)!', error);
         if (window.app && window.app.showAlert) {
-            window.app.showAlert('Erro ao gerar relatório! ' + error.message, 'error');
+            window.app.showAlert('Erro ao gerar relatório (Template)! ' + error.message, 'error');
         }
     }
+}
+
+// GERAR RELATÓRIO NO FORMATO VISUALIZAÇÃO - PDF (sem mexer no servidor)
+async function gerarRelatorioVisualizacao() {
+    try {
+        if (!relatorioData || Object.keys(relatorioData).length === 0) {
+            relatorioData = collectRelatorioFormData();
+        }
+
+        console.log('🎨 Gerando relatório (Visualização) como PDF!', relatorioData);
+
+        // Criar conteúdo HTML para o PDF
+        const conteudoPDF = criarConteudoPDF(relatorioData);
+        
+        // Criar uma nova janela para gerar o PDF
+        const janelaPDF = window.open('', '_blank');
+        janelaPDF.document.write(conteudoPDF);
+        janelaPDF.document.close();
+        
+        // Esperar o conteúdo carregar e então imprimir como PDF
+        setTimeout(() => {
+            janelaPDF.print();
+            
+            // Mostrar seção de download com mensagem diferente
+            document.getElementById('download-section').classList.remove('hidden');
+            document.querySelector('#download-section .alert').textContent = '✅ Relatório (Visualização) pronto para salvar como PDF!';
+            
+            // Configurar botão para abrir novamente o PDF se necessário
+            const downloadBtn = document.getElementById('download-btn');
+            if (downloadBtn) {
+                downloadBtn.textContent = '📄 Abrir PDF Novamente';
+                downloadBtn.onclick = () => {
+                    const novaJanela = window.open('', '_blank');
+                    novaJanela.document.write(conteudoPDF);
+                    novaJanela.document.close();
+                    setTimeout(() => novaJanela.print(), 500);
+                };
+            }
+
+            if (window.app && window.app.showAlert) {
+                window.app.showAlert('Relatório (Visualização) pronto! Use a opção "Salvar como PDF" na impressão.', 'success');
+            }
+        }, 500);
+
+    } catch (error) {
+        console.error('❌ Erro ao gerar relatório (Visualização)!', error);
+        if (window.app && window.app.showAlert) {
+            window.app.showAlert('Erro ao gerar relatório (Visualização)! ' + error.message, 'error');
+        }
+    }
+}
+
+// FUNÇÃO PARA CRIAR CONTEÚDO DO PDF
+function criarConteudoPDF(dados) {
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Relatório Financeiro - ${dados.nomecondominio || 'Condomínio'}</title>
+            <style>
+                @media print {
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 20px; 
+                        color: #333;
+                        font-size: 14px;
+                    }
+                    .header { 
+                        text-align: center; 
+                        border-bottom: 2px solid #333; 
+                        padding-bottom: 15px; 
+                        margin-bottom: 20px; 
+                    }
+                    .section { 
+                        margin-bottom: 20px; 
+                        page-break-inside: avoid;
+                    }
+                    .section h3 { 
+                        background-color: #f8f9fa; 
+                        padding: 10px; 
+                        border-left: 4px solid #007bff;
+                        margin-bottom: 15px;
+                    }
+                    .row { 
+                        display: flex; 
+                        margin-bottom: 15px;
+                        page-break-inside: avoid;
+                    }
+                    .col-6 { 
+                        flex: 1; 
+                        padding: 0 15px; 
+                    }
+                    .alert { 
+                        padding: 12px; 
+                        border-radius: 4px; 
+                        margin: 8px 0;
+                        border: 1px solid;
+                    }
+                    .alert-warning { 
+                        background-color: #fff3cd; 
+                        border-color: #ffeaa7; 
+                    }
+                    .alert-info { 
+                        background-color: #d1ecf1; 
+                        border-color: #bee5eb; 
+                    }
+                    .alert-success { 
+                        background-color: #d4edda; 
+                        border-color: #c3e6cb; 
+                        font-weight: bold;
+                        font-size: 16px;
+                    }
+                    p { 
+                        margin: 8px 0; 
+                        line-height: 1.4;
+                    }
+                    strong { 
+                        color: #333; 
+                    }
+                    h1 {
+                        color: #2c3e50;
+                        margin-bottom: 10px;
+                    }
+                    h2 {
+                        color: #34495e;
+                        margin-bottom: 5px;
+                    }
+                    h3 {
+                        color: #2c3e50;
+                        margin-top: 0;
+                    }
+                    h4 {
+                        color: #34495e;
+                        border-bottom: 1px solid #ecf0f1;
+                        padding-bottom: 5px;
+                        margin-bottom: 10px;
+                    }
+                }
+                
+                /* Estilo para visualização na tela */
+                body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 25px; 
+                    color: #333;
+                    font-size: 14px;
+                }
+                .header { 
+                    text-align: center; 
+                    border-bottom: 2px solid #333; 
+                    padding-bottom: 15px; 
+                    margin-bottom: 25px; 
+                }
+                .section { 
+                    margin-bottom: 25px; 
+                }
+                .section h3 { 
+                    background-color: #f8f9fa; 
+                    padding: 12px; 
+                    border-left: 4px solid #007bff;
+                    margin-bottom: 15px;
+                }
+                .row { 
+                    display: flex; 
+                    margin-bottom: 20px;
+                }
+                .col-6 { 
+                    flex: 1; 
+                    padding: 0 20px; 
+                }
+                .alert { 
+                    padding: 15px; 
+                    border-radius: 6px; 
+                    margin: 10px 0;
+                    border: 1px solid;
+                }
+                .alert-warning { 
+                    background-color: #fff3cd; 
+                    border-color: #ffeaa7; 
+                }
+                .alert-info { 
+                    background-color: #d1ecf1; 
+                    border-color: #bee5eb; 
+                }
+                .alert-success { 
+                    background-color: #d4edda; 
+                    border-color: #c3e6cb; 
+                    font-weight: bold;
+                    font-size: 16px;
+                }
+                p { 
+                    margin: 10px 0; 
+                    line-height: 1.5;
+                }
+                strong { 
+                    color: #2c3e50; 
+                }
+                h1 {
+                    color: #2c3e50;
+                    margin-bottom: 15px;
+                    font-size: 28px;
+                }
+                h2 {
+                    color: #34495e;
+                    margin-bottom: 10px;
+                    font-size: 22px;
+                }
+                h3 {
+                    color: #2c3e50;
+                    margin-top: 0;
+                    font-size: 18px;
+                }
+                h4 {
+                    color: #34495e;
+                    border-bottom: 2px solid #ecf0f1;
+                    padding-bottom: 8px;
+                    margin-bottom: 15px;
+                    font-size: 16px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>📊 RELATÓRIO FINANCEIRO - CONDOMÍNIO</h1>
+                <h2>${dados.nomecondominio || 'Condomínio Não Informado'}</h2>
+                <p><strong>Data de Emissão:</strong> ${dados.dataEmissao || 'Não informada'}</p>
+            </div>
+
+            <div class="row">
+                <div class="col-6">
+                    <div class="section">
+                        <h3>📋 DADOS DO RELATÓRIO</h3>
+                        <p><strong>Condomínio:</strong> ${dados.nomecondominio || 'Não informado'}</p>
+                        <p><strong>Endereço:</strong> ${dados.enderecoCondominio || 'Não informado'}</p>
+                        <p><strong>Unidade:</strong> ${dados.unidade || 'Não informado'}</p>
+                        <p><strong>Quantidade de Unidades:</strong> ${dados.quantidadeUnidades || '1'}</p>
+                        <p><strong>Mês/Ano de Referência:</strong> ${dados.mesAnoDespesas || 'Não informado'}</p>
+                        <p><strong>Data de Vencimento:</strong> ${dados.vencimento || 'Não informado'}</p>
+                        <p><strong>Período de Referência:</strong> ${dados.periodoReferencia || 'Não informado'}</p>
+                        <p><strong>Responsável:</strong> ${dados.responsavel || 'Não informado'}</p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="section">
+                        <h3>💰 DESPESAS DO CONDOMÍNIO</h3>
+                        <p><strong>Energia:</strong> R$ ${dados.valorEnergia || '0,00'}</p>
+                        <p><strong>Água:</strong> R$ ${dados.valorAgua || '0,00'}</p>
+                        <p><strong>Limpeza:</strong> R$ ${dados.valorLimpeza || '0,00'}</p>
+                        <p><strong>Materiais:</strong> R$ ${dados.valorMateriais || '0,00'}</p>
+                        <p><strong>Honorários:</strong> R$ ${dados.honorarios || '0,00'}</p>
+                        <p><strong>Tarifas Bancárias:</strong> R$ ${dados.valortarifas || '0,00'}</p>
+                        <div class="alert alert-warning">
+                            <strong>💰 TOTAL DE DESPESAS:</strong> R$ ${dados.totaldespesas || '0,00'}
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>🏠 DESPESA POR UNIDADE:</strong> R$ ${dados.despesaPorUnidade || '0,00'}
+                        </div>
+                        
+                        <h3>💵 OUTROS VALORES</h3>
+                        <p><strong>Aluguel:</strong> R$ ${dados.valorAluguel || '0,00'}</p>
+                        <p><strong>IPTU:</strong> R$ ${dados.valorIPTU || '0,00'}</p>
+                        <p><strong>Condomínio:</strong> R$ ${dados.valorCondominio || '0,00'}</p>
+                        <div class="alert alert-success">
+                            <strong>🎯 VALOR TOTAL FINAL:</strong> R$ ${dados.valorTotalFinal || '0,00'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ecf0f1;">
+                <p><em>Relatório gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</em></p>
+            </div>
+
+            <script>
+                // Focar na janela para impressão
+                window.focus();
+            </script>
+        </body>
+        </html>
+   `;
 }

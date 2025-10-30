@@ -57,7 +57,7 @@ async function loadFichaCadastralPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Endereço</label>
-                                <input type="text" id="endereco" class="form-control" placeholder="Endereço completo">
+                                <input type="text" id="enderecoLocatario" class="form-control" placeholder="Endereço completo">
                             </div>
                         </div>
                     </div>
@@ -72,7 +72,7 @@ async function loadFichaCadastralPage() {
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Data Entrada</label>
-                                <input type="text" id="dataEntrada" class="form-control" placeholder="DD/MM/AAAA" value="${new Date().toLocaleDateString('pt-BR')}">
+                                <input type="text" id="dataEntrada" class="form-control" placeholder="DD/MM/AAAA" >
                             </div>
                         </div>
                         <div class="col-4">
@@ -209,7 +209,7 @@ async function loadFichaCadastralPage() {
 
                     <!-- Dados do Imóvel -->
                     <div class="section-header">
-                        <h3>DADOS DO IMÓVEL</h3>
+                        <h3>DADOS DO IMÓVEL (Endereço) </h3>
                     </div>
 
                     <div class="form-group">
@@ -255,7 +255,7 @@ async function loadFichaCadastralPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>IPTU</label>
-                                <input type="text" id="IPTUimovel" class="form-control" placeholder="IPTU">
+                                <input type="text" id="IPTUImovel" class="form-control" placeholder="IPTU">
                             </div>
                         </div>
                         <div class="col-6">
@@ -380,7 +380,7 @@ function adicionarCaracteristica() {
     caracteristicasCount++;
     const caracHTML = `
         <div class="form-group">
-            <input type="text" id="caracteristica${caracteristicasCount}" class="form-control" placeholder="Ex: 3 quartos, 2 banheiros, garagem, etc.">
+            <input type="text" id="caracteristicas${caracteristicasCount}" class="form-control" placeholder="Ex: 3 quartos, 2 banheiros, garagem, etc.">
         </div>
     `;
 
@@ -466,7 +466,7 @@ function coletarDadosFichaCadastral() {
         nomeLocatario: getValue('nomeLocatario'),
         RGLocatario: getValue('RGLocatario'),
         CPFLocatario: getValue('CPFLocatario'),
-        endereco: getValue('endereco'),
+        enderecoLocatario: getValue('enderecoLocatario'),
         valorLocacaoMensal: getValue('valorLocacaoMensal'),
         dataEntrada: getValue('dataEntrada'),          
         dataVenc: getValue('dataVenc'),
@@ -494,7 +494,7 @@ function coletarDadosFichaCadastral() {
         // Serviços
         CemigInstalacao: getValue('CemigInstalacao'),
         matriculaCopasa: getValue('matriculaCopasa'),
-        IPTUimovel: getValue('IPTUimovel'),
+        IPTUImovel: getValue('IPTUImovel'),
         InscricaoIPTU: getValue('InscricaoIPTU'),
 
         // Características
@@ -573,7 +573,7 @@ function getPipefyFieldMappings() {
         'nomeLocatario': 'nomeLocatario',
         'RGLocatario': 'RGLocatario',
         'CPFLocatario': 'CPFLocatario',
-        'endereco': 'endereco',
+        'enderecoImovel': 'enderecoImovel',
         'valor_aluguel': 'valorLocacaoMensal',
         'data_entrada': 'dataEntrada',         
         'vencimento': 'dataVenc',  
@@ -596,7 +596,8 @@ function getPipefyFieldMappings() {
         'declaracaoImposto': 'declaracaoImposto',
         
         // Dados do Imóvel
-        'endereco_imovel': 'enderecoImovel',
+        'enderecoImovel': 'enderecoImovel',
+        'caracteristicasImovel': 'caracteristicasImovel',
         
         // Serviços
         'cemig_instalacao': 'CemigInstalacao',

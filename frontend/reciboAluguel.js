@@ -43,19 +43,19 @@ async function loadReciboAluguelPage() {
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Período de:</label>
-                                <input type="text" id="inicioPeriodo" class="form-control" placeholder="dd/mm/aaaa" value="${new Date().toLocaleDateString('pt-BR')}">
+                                <input type="text" id="inicioPeriodo" class="form-control" placeholder="dd/mm/aaaa" >
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Até:</label>
-                                <input type="text" id="finalPeriodo" class="form-control" placeholder="dd/mm/aaaa" value="${new Date().toLocaleDateString('pt-BR')}">
+                                <input type="text" id="finalPeriodo" class="form-control" placeholder="dd/mm/aaaa" >
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Vencimento:</label>
-                                <input type="text" id="vencimento" class="form-control" placeholder="dd/mm/aaaa" value="${new Date().toLocaleDateString('pt-BR')}">
+                                <input type="text" id="vencimento" class="form-control" placeholder="dd/mm/aaaa" >
                             </div>
                         </div>
                     </div>
@@ -64,13 +64,13 @@ async function loadReciboAluguelPage() {
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Limite Pagamento:</label>
-                                <input type="text" id="limitePagamento" class="form-control" placeholder="dd/mm/aaaa" value="${new Date().toLocaleDateString('pt-BR')}">
+                                <input type="text" id="limitePagamento" class="form-control" placeholder="dd/mm/aaaa" >
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Data do Recibo:</label>
-                                <input type="text" id="data" class="form-control" value="${new Date().toLocaleDateString('pt-BR')}">
+                                <input type="text" id="data" class="form-control" placeholder="dd/mm/aaaa">>
                             </div>
                         </div>
                     </div>
@@ -329,33 +329,53 @@ async function loadPipefyDataRecibo() {
     }
 }
 
-// PREENCHER FORMULÁRIO COM DADOS DO PIPEFY
+// PREENCHER FORMULÁRIO COM DADOS DO PIPEFY - CORRIGIDO
 function fillReciboFormWithCardData(cardData) {
-    console.log('🎯 Preenchendo recibo com dados do Pipefy...');
-    
-    const dados = cardData.dadosPreenchidos;
+    const dados = cardData.dadosPreenchidos || cardData;
     let camposPreenchidos = 0;
 
-    Object.keys(dados).forEach(campo => {
-        const valor = dados[campo];
-        const input = document.getElementById(campo);
-        
-        if (input && valor && valor !== "") {
-            input.value = valor;
+    // Preencher NOME DO LOCATÁRIO
+    const nomeLocatario = dados['nomeLocatario'];
+    if (nomeLocatario && nomeLocatario !== "" && nomeLocatario !== null && nomeLocatario !== undefined) {
+        const inputNome = document.getElementById('nomeLocatario');
+        if (inputNome) {
+            inputNome.value = nomeLocatario;
             camposPreenchidos++;
-            console.log(`✅ ${campo}: ${valor}`);
         }
-    });
+    }
 
-    console.log(`🎉 ${camposPreenchidos} campos preenchidos no recibo`);
+    // Preencher ENDEREÇO DO IMÓVEL (usando enderecoLocatario)
+    const enderecoImovel = dados['enderecoLocatario'];
+    if (enderecoImovel && enderecoImovel !== "" && enderecoImovel !== null && enderecoImovel !== undefined) {
+        const inputEndereco = document.getElementById('enderecoImovel');
+        if (inputEndereco) {
+            inputEndereco.value = enderecoImovel;
+            camposPreenchidos++;
+        }
+    }
+
+    // Preencher VALOR DO ALUGUEL
+    const valorLocacao = dados['valorLocacaoMensal'];
+    if (valorLocacao && valorLocacao !== "" && valorLocacao !== null && valorLocacao !== undefined) {
+        const inputValor = document.getElementById('valorAluguel');
+        if (inputValor && !inputValor.value) {
+            // Extrair apenas números do valor (ex: "5000(CINCO MIL REAIS)" -> "5000")
+            const valorNumerico = valorLocacao.match(/\d+/g);
+            if (valorNumerico && valorNumerico[0]) {
+                inputValor.value = valorNumerico[0] + ',00';
+                camposPreenchidos++;
+            }
+        }
+    }
+
+    // Recalcular totais
+    setTimeout(calcularTotal, 500);
     
     if (camposPreenchidos > 0 && window.app && window.app.showAlert) {
         window.app.showAlert(`${camposPreenchidos} campos preenchidos automaticamente!`, 'success');
     }
     
     return camposPreenchidos;
-
-
 }
 
 // GERAR RECIBO
@@ -364,8 +384,6 @@ async function gerarRecibo() {
         if (!reciboData || Object.keys(reciboData).length === 0) {
             reciboData = collectReciboFormData();
         }
-
-        console.log('💰 Enviando dados para gerar recibo!', reciboData);
 
         const response = await fetch('/api/gerar-documento/recibo-aluguel', {
             method: 'POST',
@@ -406,7 +424,7 @@ async function gerarRecibo() {
         }
 
     } catch (error) {
-        console.error('❌ Erro ao gerar recibo!', error);
+        console.error('Erro ao gerar recibo!', error);
         if (window.app && window.app.showAlert) {
             window.app.showAlert('Erro ao gerar recibo! ' + error.message, 'error');
         }

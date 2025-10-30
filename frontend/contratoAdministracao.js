@@ -61,7 +61,7 @@ async function loadContratoAdministracaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Estado Civil</label>
-                                <input type="text" id="estadoCivil" class="form-control" placeholder="Solteiro, Casado, etc.">
+                                <input type="text" id="estadoCivilProprietario" class="form-control" placeholder="Solteiro, Casado, etc.">
                             </div>
                         </div>
                         <div class="col-6">
@@ -128,7 +128,7 @@ async function loadContratoAdministracaoPage() {
                     </div>
 
                     <div class="form-group">
-                        <input type="text" id="EnderecoImovel" class="form-control" placeholder="Endereço completo do imóvel">
+                        <input type="text" id="enderecoImovel" class="form-control" placeholder="Endereço completo do imóvel">
                     </div>
 
                     <!-- Características do Imóvel -->
@@ -155,7 +155,7 @@ async function loadContratoAdministracaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>N° Hidrómetro</label>
-                                <input type="text" id="hidrometro" class="form-control" placeholder="Número do hidrômetro">
+                                <input type="text" id="hidrometroCopasa" class="form-control" placeholder="Número do hidrômetro">
                             </div>
                         </div>
                     </div>
@@ -179,7 +179,7 @@ async function loadContratoAdministracaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>IPTU Imóvel</label>
-                                <input type="text" id="IPTUimovel" class="form-control" placeholder="IPTU">
+                                <input type="text" id="IPTUImovel" class="form-control" placeholder="IPTU">
                             </div>
                         </div>
                         <div class="col-6">
@@ -199,13 +199,13 @@ async function loadContratoAdministracaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Dia do Pagamento</label>
-                                <input type="text" id="dataAluguel" class="form-control" placeholder="Ex: 05 (cinco)" value="05">
+                                <input type="text" id="dataAluguel" class="form-control" placeholder="Ex: 05 (cinco)" >
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Data Início</label>
-                                <input type="text" id="dataInicioContrato" class="form-control" placeholder="DD/MM/AAAA" value="${new Date().toLocaleDateString('pt-BR')}">
+                                <input type="text" id="dataInicioContrato" class="form-control" placeholder="DD/MM/AAAA" >
                             </div>
                         </div>
                     </div>
@@ -214,13 +214,13 @@ async function loadContratoAdministracaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Valor do Aluguel</label>
-                                <input type="text" id="valorAluguel" class="form-control" placeholder="R$ 0,00 (valor por extenso)">
+                                <input type="text" id="valorLocacaoMensal" class="form-control" placeholder="R$ 0,00 (valor por extenso)">
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Data do Contrato</label>
-                                <input type="text" id="dataContrato" class="form-control" placeholder="Dia, Mês de Ano" value="${formatarDataContrato()}">
+                                <input type="text" id="dataContrato" class="form-control" placeholder="Dia, Mês de Ano" >
                             </div>
                         </div>
                     </div>
@@ -368,7 +368,7 @@ function coletarDadosAdministracaoFormulario() {
         RGProprietario: getValue('RGProprietario'),
         CPFProprietario: getValue('CPFProprietario'),
         profissaoProprietario: getValue('profissaoProprietario'),
-        estadoCivil: getValue('estadoCivil'),
+        estadoCivilProprietario: getValue('estadoCivilProprietario'),
         enderecoProprietario: getValue('enderecoProprietario'),
         celProprietario: getValue('celProprietario'),
         emailProprietario: getValue('emailProprietario'),
@@ -380,21 +380,21 @@ function coletarDadosAdministracaoFormulario() {
         declaracaoImposto: getValue('declaracaoImposto'),
 
         // Dados do Imóvel
-        EnderecoImovel: getValue('EnderecoImovel'),
+        enderecoImovel: getValue('enderecoImovel'),
         caracteristicasImovel: getValue('caracteristicasImovel'),
 
         // Serviços
         matriculaCopasa: getValue('matriculaCopasa'),
-        hidrometro: getValue('hidrometro'),
-        cemigInstalacao: getValue('cemigInstalacao'),
+        hidrometro: getValue('hidrometroCopasa'),
+        CemigInstalacao: getValue('CemigInstalacao'),
         numeroMedidor: getValue('numeroMedidor'),
-        IPTUimovel: getValue('IPTUimovel'),
+        IPTUImovel: getValue('IPTUImovel'),
         InscricaoIPTU: getValue('InscricaoIPTU'),
 
         // Dados do Contrato
         dataAluguel: getValue('dataAluguel'),
         dataInicioContrato: getValue('dataInicioContrato'),
-        valorAluguel: getValue('valorAluguel'),
+        valorAluguel: getValue('valorLocacaoMensal'),
         dataContrato: getValue('dataContrato'),
 
         // Testemunhas
@@ -438,6 +438,8 @@ function getPipefyFieldMappingsAdmin() {
         'RGProprietario': 'RGProprietario',
         'CPFProprietario': 'CPFProprietario', 
         'enderecoProprietario': 'enderecoProprietario',
+        'profissaoProprietario': 'profissaoProprietario',
+        'estadoCivilProprietario': 'estadoCivilProprietario',
         'celProprietario': 'celProprietario',
         'emailProprietario': 'emailProprietario',
         
@@ -446,17 +448,144 @@ function getPipefyFieldMappingsAdmin() {
         'agencia': 'agencia',
         'conta': 'conta',
         'pix': 'pix',
+        'valorAluguel': 'valorLocacaoMensal',
         
         // Serviços - CORRIGIDOS
-        'CemigInstalacao': 'cemigInstalacao', 
+        'CemigInstalacao': 'CemigInstalacao', 
         'matriculaCopasa': 'matriculaCopasa',
-        'hidrometro': 'hidrometro',
+        'hidrometroCopasa': 'hidrometroCopasa',
         'numeroMedidor': 'numeroMedidor',
-        'enderecoImovel': 'EnderecoImovel', 
+        'enderecoImovel': 'enderecoImovel',
+        'IPTUImovel': 'IPTUImovel', 
         
     };
 }
+// DEBUG COMPLETO - adicione esta função
+function debugCompletePipefyData(cardData) {
+    console.log('=== 🐛 DEBUG COMPLETO - ANALISANDO DADOS PIPEFY ===');
+    
+    const dados = cardData.dadosPreenchidos;
+    
+    // 1. Mostrar TODOS os campos disponíveis
+    console.log('📋 TODOS OS CAMPOS DISPONÍVEIS:');
+    Object.keys(dados).forEach((campo, index) => {
+        console.log(`   ${index + 1}. "${campo}" = "${dados[campo]}"`);
+    });
+    
+    // 2. Procurar por campos relacionados a estado civil
+    console.log('🔍 PROCURANDO CAMPOS DE ESTADO CIVIL:');
+    const camposEstadoCivil = Object.keys(dados).filter(campo => 
+        campo.toLowerCase().includes('estado') || 
+        campo.toLowerCase().includes('civil') ||
+        campo.toLowerCase().includes('estadocivil')
+    );
+    camposEstadoCivil.forEach(campo => {
+        console.log(`   ✅ Encontrado: "${campo}" = "${dados[campo]}"`);
+    });
+    
+    // 3. Procurar por campos relacionados a profissão
+    console.log('🔍 PROCURANDO CAMPOS DE PROFISSÃO:');
+    const camposProfissao = Object.keys(dados).filter(campo => 
+        campo.toLowerCase().includes('profiss') || 
+        campo.toLowerCase().includes('ocupacao') ||
+        campo.toLowerCase().includes('profissao')
+    );
+    camposProfissao.forEach(campo => {
+        console.log(`   ✅ Encontrado: "${campo}" = "${dados[campo]}"`);
+    });
+    
+    // 4. Verificar mapeamento atual
+    console.log('🔍 MAPEAMENTO ATUAL:');
+    const mappings = getPipefyFieldMappingsAdmin();
+    Object.keys(mappings).forEach(key => {
+        if (key.includes('Estado Civil') || key.includes('Profissão')) {
+            console.log(`   📍 "${key}" -> "${mappings[key]}"`);
+        }
+    });
+    
+    // 5. Verificar se os inputs existem no DOM
+    console.log('🔍 VERIFICANDO INPUTS NO DOM:');
+    const inputEstadoCivil = document.getElementById('estadoCivilProprietario');
+    const inputProfissao = document.getElementById('profissaoProprietario');
+    console.log(`   Input estadoCivilProprietario: ${inputEstadoCivil ? 'EXISTE' : 'NÃO EXISTE'}`);
+    console.log(`   Input profissaoProprietario: ${inputProfissao ? 'EXISTE' : 'NÃO EXISTE'}`);
+    
+    console.log('=== FIM DEBUG ===');
+}
 
+// MODIFIQUE a função fillAdminFormWithCardData para usar o debug:
+function fillAdminFormWithCardData(cardData) {
+    console.log('🎯 Preenchendo contrato administração com dados do Pipefy...');
+    
+    // EXECUTAR DEBUG COMPLETO
+    debugCompletePipefyData(cardData);
+    
+    const dados = cardData.dadosPreenchidos;
+    const mappings = getPipefyFieldMappingsAdmin();
+    let camposPreenchidos = 0;
+
+    // Tentativa 1: Preenchimento por mapeamento
+    Object.keys(dados).forEach(campoPipefy => {
+        const valor = dados[campoPipefy];
+        
+        if (!valor || valor === "" || valor === "undefined" || valor === "null") {
+            return;
+        }
+
+        const campoFormulario = mappings[campoPipefy];
+        if (campoFormulario) {
+            const input = document.getElementById(campoFormulario);
+            if (input) {
+                input.value = valor;
+                camposPreenchidos++;
+                console.log(`✅ MAPEADO: "${campoPipefy}" -> "${campoFormulario}": "${valor}"`);
+            }
+        }
+    });
+
+    // Tentativa 2: Preenchimento direto (fallback)
+    Object.keys(dados).forEach(campoPipefy => {
+        const valor = dados[campoPipefy];
+        const inputDireto = document.getElementById(campoPipefy);
+        
+        if (inputDireto && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
+            inputDireto.value = valor;
+            camposPreenchidos++;
+            console.log(`✅ DIRETO: "${campoPipefy}": "${valor}"`);
+        }
+    });
+
+    // Tentativa 3: Busca por similaridade (último recurso)
+    const camposCriticos = {
+        'estadoCivilProprietario': ['estado', 'civil', 'estadocivil'],
+        'profissaoProprietario': ['profiss', 'ocupacao', 'trabalho']
+    };
+
+    Object.keys(camposCriticos).forEach(campoForm => {
+        const input = document.getElementById(campoForm);
+        if (input && !input.value) {
+            const keywords = camposCriticos[campoForm];
+            
+            Object.keys(dados).forEach(campoPipefy => {
+                const valor = dados[campoPipefy];
+                if (valor && keywords.some(keyword => campoPipefy.toLowerCase().includes(keyword))) {
+                    input.value = valor;
+                    camposPreenchidos++;
+                    console.log(`🎉 SIMILARIDADE: "${campoPipefy}" -> "${campoForm}": "${valor}"`);
+                }
+            });
+        }
+    });
+
+    console.log(`🎉 Total: ${camposPreenchidos} campos preenchidos`);
+    
+    // Verificação final
+    console.log('📊 VERIFICAÇÃO FINAL:');
+    console.log(`   Estado Civil: "${document.getElementById('estadoCivilProprietario').value}"`);
+    console.log(`   Profissão: "${document.getElementById('profissaoProprietario').value}"`);
+    
+    return camposPreenchidos;
+}
 // SUBSTITUA A FUNÇÃO fillAdminFormWithCardData POR ESTA:
 function fillAdminFormWithCardData(cardData) {
     console.log('🎯 Preenchendo contrato administração com dados do Pipefy...');

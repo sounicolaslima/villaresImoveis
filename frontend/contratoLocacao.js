@@ -1,5 +1,5 @@
 //===========================================================
-// CONTRATO DE LOCAÇÃO - COMPLETO E CORRIGIDO
+// CONTRATO DE LOCAÇÃO - VERSÃO CORRIGIDA E SIMPLIFICADA
 //===========================================================
 
 let fiadoresCount = 1;
@@ -34,65 +34,53 @@ async function loadContratoLocacaoPage() {
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
-                                <label>Nome</label>
+                                <label>Nome Completo</label>
                                 <input type="text" id="nomeLocatario" class="form-control" placeholder="Nome completo do locatário">
                             </div>
                         </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>Nacionalidade</label>
+                                <input type="text" id="nacionalidadeLocatario" class="form-control" placeholder="Ex: Brasileira" value="Brasileira">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>Estado Civil</label>
+                                <input type="text" id="estadoCivilLocatario" class="form-control" placeholder="Ex: Solteiro, Casado">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>Profissão</label>
+                                <input type="text" id="profissaoLocatario" class="form-control" placeholder="Profissão do locatário">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-6">
                             <div class="form-group">
                                 <label>RG</label>
                                 <input type="text" id="RGLocatario" class="form-control" placeholder="00.000.000-0">
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-6">
                             <div class="form-group">
                                 <label>CPF</label>
                                 <input type="text" id="CPFLocatario" class="form-control" placeholder="000.000.000-00">
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>E-mail</label>
-                                <input type="email" id="email" class="form-control" placeholder="email@exemplo.com">
-                            </div>
-                        </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-12">
                             <div class="form-group">
-                                <label>Endereço</label>
-                                <input type="text" id="endereco" class="form-control" placeholder="Endereço completo">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Celular</label>
-                                <input type="text" id="celular" class="form-control" placeholder="(00) 00000-0000">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-4">
-                            <div class="form-group">
-                                <label>Data de Entrada</label>
-                                <input type="text" id="dataEntrada" class="form-control" placeholder="DD/MM/AAAA" value="${new Date().toLocaleDateString('pt-BR')}">
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="form-group">
-                                <label>Vencimento</label>
-                                <input type="text" id="vencimento" class="form-control" placeholder="Dia do vencimento" value="05">
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="form-group">
-                                <label>Valor da Locação</label>
-                                <input type="text" id="valorLocacao" class="form-control" placeholder="R$ 0,00 (Valor por extenso)">
+                                <label>Endereço Completo</label>
+                                <input type="text" id="enderecoLocatario" class="form-control" placeholder="Endereço completo do locatário">
                             </div>
                         </div>
                     </div>
@@ -100,14 +88,9 @@ async function loadContratoLocacaoPage() {
                     <!-- Fiadores -->
                     <div class="section-header">
                         <h3>FIADORES</h3>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <button type="button" class="btn btn-secondary btn-block" onclick="adicionarFiador()">
-                                + Adicionar Fiador
-                            </button>
-                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="adicionarFiador()">
+                            + Adicionar Fiador
+                        </button>
                     </div>
 
                     <div id="fiadores-container"></div>
@@ -118,46 +101,10 @@ async function loadContratoLocacaoPage() {
                     </div>
 
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-12">
                             <div class="form-group">
-                                <label>Nome Proprietário</label>
-                                <input type="text" id="nomeProprietario" class="form-control" placeholder="Nome completo">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>RG Proprietário</label>
-                                <input type="text" id="RGProprietario" class="form-control" placeholder="0000000">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>CPF Proprietário</label>
-                                <input type="text" id="CPFProprietario" class="form-control" placeholder="000.000.000-00">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Endereço Proprietário</label>
-                                <input type="text" id="enderecoProprietario" class="form-control" placeholder="Endereço completo">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Celular Proprietário</label>
-                                <input type="text" id="celProprietario" class="form-control" placeholder="(00) 00000-0000">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>E-mail Proprietário</label>
-                                <input type="email" id="emailProprietario" class="form-control" placeholder="email@exemplo.com">
+                                <label>Nome do Proprietário</label>
+                                <input type="text" id="nomeProprietario" class="form-control" placeholder="Nome completo do proprietário">
                             </div>
                         </div>
                     </div>
@@ -177,33 +124,18 @@ async function loadContratoLocacaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Endereço do Imóvel</label>
-                                <input type="text" id="EnderecoImovel" class="form-control" placeholder="Endereço completo">
+                                <input type="text" id="enderecoImovel" class="form-control" placeholder="Endereço completo do imóvel">
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-12">
                             <div class="form-group">
-                                <label>CEP</label>
-                                <input type="text" id="CEPImovel" class="form-control" placeholder="00000-000">
+                                <label>Características do Imóvel</label>
+                                <textarea id="caracteristicasImovel" class="form-control" rows="3" placeholder="Ex: 3 quartos, 2 banheiros, garagem, área de serviço, etc."></textarea>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Cidade</label>
-                                <input type="text" id="CidadeImovel" class="form-control" placeholder="Cidade/UF">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Características do Imóvel -->
-                    <div class="section-header">
-                        <h3>CARACTERÍSTICAS DO IMÓVEL</h3>
-                    </div>
-
-                    <div class="form-group">
-                        <textarea id="caracteristicasImovel" class="form-control" rows="3" placeholder="Ex: 3 quartos, 2 banheiros, garagem, área de serviço, etc."></textarea>
                     </div>
 
                     <!-- Serviços e Tributos -->
@@ -236,7 +168,7 @@ async function loadContratoLocacaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>N° Medidor</label>
-                                <input type="text" id="medidor" class="form-control" placeholder="Número do medidor">
+                                <input type="text" id="numeroMedidor" class="form-control" placeholder="Número do medidor">
                             </div>
                         </div>
                     </div>
@@ -245,13 +177,13 @@ async function loadContratoLocacaoPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>IPTU</label>
-                                <input type="text" id="IPTUimovel" class="form-control" placeholder="IPTU">
+                                <input type="text" id="IPTUImovel" class="form-control" placeholder="Número do IPTU">
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Inscrição IPTU</label>
-                                <input type="text" id="inscricaoIPTU" class="form-control" placeholder="Número de inscrição">
+                                <input type="text" id="InscricaoIPTU" class="form-control" placeholder="Número de inscrição">
                             </div>
                         </div>
                     </div>
@@ -264,20 +196,20 @@ async function loadContratoLocacaoPage() {
                     <div class="row">
                         <div class="col-4">
                             <div class="form-group">
-                                <label>Duração</label>
-                                <input type="text" id="duracao" class="form-control" placeholder="Ex: 12 meses" value="12 meses">
+                                <label>Duração (meses)</label>
+                                <input type="text" id="duracao" class="form-control" placeholder="Ex: 12 meses" >
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Data Início</label>
-                                <input type="text" id="dataInicio" class="form-control" placeholder="DD/MM/AAAA" value="${new Date().toLocaleDateString('pt-BR')}">
+                                <input type="text" id="dataInicio" class="form-control" placeholder="DD/MM/AAAA" >
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
-                                <label>Data Término</label>
-                                <input type="text" id="dataTermino" class="form-control" placeholder="DD/MM/AAAA" value="${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString('pt-BR')}">
+                                <label>Data Término (Automático)</label>
+                                <input type="text" id="dataTermino" class="form-control" placeholder="Será calculado automaticamente" readonly>
                             </div>
                         </div>
                     </div>
@@ -285,20 +217,15 @@ async function loadContratoLocacaoPage() {
                     <div class="row">
                         <div class="col-4">
                             <div class="form-group">
-                                <label>Valor Mensal</label>
-                                <input type="text" id="ValorLocacaoMensal" class="form-control" placeholder="0,00 (valor por extenso)">
+                                <label>Valor Mensal da Locação</label>
+                                <input type="text" id="valorLocacaoMensal" class="form-control" placeholder="R$ 0,00">
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="form-group">
-                                <label>Mês de Desocupação</label>
-                                <input type="text" id="mesDeDesocupacao" class="form-control" placeholder="Ex: 12 (décimo segundo)">
-                            </div>
-                        </div>
+                        
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Data do Contrato</label>
-                                <input type="text" id="dataContrato" class="form-control" placeholder="Ex: Dia, Mês de Ano">
+                                <input type="text" id="dataContrato" class="form-control" placeholder="Ex: 30 de novembro de 2025">
                             </div>
                         </div>
                     </div>
@@ -329,8 +256,93 @@ async function loadContratoLocacaoPage() {
     fiadoresCount = 1;
     adicionarFiador();
     
-    // Configurar Pipefy se disponível
+    // Configurar eventos para cálculo automático
+    setTimeout(() => {
+        const duracaoInput = document.getElementById('duracao');
+        const dataInicioInput = document.getElementById('dataInicio');
+        
+        if (duracaoInput && dataInicioInput) {
+            calcularDataTermino();
+            duracaoInput.addEventListener('input', calcularDataTermino);
+            dataInicioInput.addEventListener('input', calcularDataTermino);
+        }
+    }, 100);
+    
+    // Carregar dados do Pipefy
     await loadPipefyDataContrato();
+}
+
+// FUNÇÃO PARA CALCULAR DATA DE TÉRMINO
+function calcularDataTermino() {
+    const duracaoInput = document.getElementById('duracao');
+    const dataInicioInput = document.getElementById('dataInicio');
+    const dataTerminoInput = document.getElementById('dataTermino');
+    
+    if (!duracaoInput || !dataInicioInput || !dataTerminoInput) return;
+    
+    const duracao = duracaoInput.value.trim();
+    const dataInicioStr = dataInicioInput.value.trim();
+    
+    if (!duracao || !dataInicioStr) {
+        dataTerminoInput.value = "";
+        return;
+    }
+    
+    try {
+        const mesesMatch = duracao.match(/(\d+)\s*mese?s?/i);
+        if (!mesesMatch) {
+            dataTerminoInput.value = "";
+            return;
+        }
+        
+        const meses = parseInt(mesesMatch[1]);
+        const dataInicioObj = validarEConverterData(dataInicioStr);
+        if (!dataInicioObj) {
+            dataTerminoInput.value = "Data inválida";
+            return;
+        }
+        
+        const dataTerminoObj = new Date(dataInicioObj);
+        dataTerminoObj.setMonth(dataTerminoObj.getMonth() + meses);
+        dataTerminoObj.setDate(dataTerminoObj.getDate() - 1);
+        
+        const diaTermino = String(dataTerminoObj.getDate()).padStart(2, '0');
+        const mesTermino = String(dataTerminoObj.getMonth() + 1).padStart(2, '0');
+        const anoTermino = dataTerminoObj.getFullYear();
+        
+        dataTerminoInput.value = `${diaTermino}/${mesTermino}/${anoTermino}`;
+        
+    } catch (error) {
+        console.error('Erro ao calcular data de término:', error);
+        dataTerminoInput.value = "Erro no cálculo";
+    }
+}
+
+// FUNÇÃO AUXILIAR PARA VALIDAR DATAS
+function validarEConverterData(dataStr) {
+    if (!dataStr) return null;
+    
+    try {
+        const regexData = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        const match = dataStr.match(regexData);
+        
+        if (!match) return null;
+        
+        const dia = parseInt(match[1]);
+        const mes = parseInt(match[2]) - 1;
+        const ano = parseInt(match[3]);
+        
+        const data = new Date(ano, mes, dia);
+        
+        if (data.getDate() !== dia || data.getMonth() !== mes || data.getFullYear() !== ano) {
+            return null;
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Erro ao converter data:', error);
+        return null;
+    }
 }
 
 // FUNÇÃO PARA ADICIONAR FIADOR
@@ -350,11 +362,32 @@ function adicionarFiador() {
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <label>Nome</label>
+                        <label>Nome Completo</label>
                         <input type="text" id="fiadorNome${fiadoresCount}" class="form-control" placeholder="Nome completo">
                     </div>
                 </div>
                 <div class="col-6">
+                    <div class="form-group">
+                        <label>Nacionalidade</label>
+                        <input type="text" id="fiadorNacionalidade${fiadoresCount}" class="form-control" placeholder="Ex: Brasileira" value="Brasileira">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label>Estado Civil</label>
+                        <input type="text" id="fiadorEstadoCivil${fiadoresCount}" class="form-control" placeholder="Ex: Solteiro, Casado">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label>Profissão</label>
+                        <input type="text" id="fiadorProfissao${fiadoresCount}" class="form-control" placeholder="Profissão">
+                    </div>
+                </div>
+                <div class="col-4">
                     <div class="form-group">
                         <label>RG</label>
                         <input type="text" id="fiadorRG${fiadoresCount}" class="form-control" placeholder="00.000.000-0">
@@ -371,23 +404,8 @@ function adicionarFiador() {
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label>Endereço</label>
+                        <label>Endereço Completo</label>
                         <input type="text" id="fiadorEndereco${fiadoresCount}" class="form-control" placeholder="Endereço completo">
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group">
-                        <label>Celular</label>
-                        <input type="text" id="fiadorCelular${fiadoresCount}" class="form-control" placeholder="(00) 00000-0000">
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label>E-mail</label>
-                        <input type="email" id="fiadorEmail${fiadoresCount}" class="form-control" placeholder="email@exemplo.com">
                     </div>
                 </div>
             </div>
@@ -406,24 +424,12 @@ function removerFiador(id) {
     }
 }
 
-// FUNÇÃO PARA GERAR CONTRATO DE LOCAÇÃO
+// FUNÇÃO PARA GERAR CONTRATO
 async function gerarContratoLocacao() {
-    console.log('🎯 Clicou em gerar contrato!');
+    console.log('🎯 Gerando contrato...');
 
     try {
         const dados = coletarDadosFormulario();
-
-        // DEBUG DETALHADO
-        console.log('📦 DADOS COLETADOS:');
-        console.log('- Nome Locatário:', dados.nomeLocatario);
-        console.log('- Total de Fiadores:', dados.fiadores.length);
-        console.log('- Fiadores:', dados.fiadores);
-        
-        if (dados.fiadores.length === 0) {
-            console.log('⚠️  AVISO: Nenhum fiador foi preenchido!');
-        }
-
-        console.log('🚀 Enviando para o servidor...');
 
         const response = await fetch('/api/gerar-documento/contrato-locacao', {
             method: 'POST',
@@ -431,15 +437,12 @@ async function gerarContratoLocacao() {
             body: JSON.stringify(dados)
         });
 
-        console.log('📡 Resposta do servidor:', response.status);
-
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Erro no servidor: ${response.status} - ${errorText}`);
         }
 
         const blob = await response.blob();
-        console.log('📄 Blob recebido:', blob.size, 'bytes');
 
         if (blob.size === 0) {
             throw new Error('Arquivo vazio recebido do servidor');
@@ -477,8 +480,7 @@ async function gerarContratoLocacao() {
     }
 }
 
-
-// FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO - COM OS NOMES CORRETOS PARA O TEMPLATE
+// FUNÇÃO PARA COLETAR DADOS DO FORMULÁRIO
 function coletarDadosFormulario() {
     const getValue = (id) => {
         const element = document.getElementById(id);
@@ -486,101 +488,51 @@ function coletarDadosFormulario() {
     };
 
     const dados = {
-        // Dados do Locatário
         nomeLocatario: getValue('nomeLocatario'),
+        nacionalidadeLocatario: getValue('nacionalidadeLocatario'),
+        estadoCivilLocatario: getValue('estadoCivilLocatario'),
+        profissaoLocatario: getValue('profissaoLocatario'),
         RGLocatario: getValue('RGLocatario'),
         CPFLocatario: getValue('CPFLocatario'),
-        endereco: getValue('endereco'),
-        valorLocacaoMensal: getValue('valorLocacao'),
-        dataEntrada: getValue('dataEntrada'),
-        dataVenc: getValue('vencimento'),
-        celular: getValue('celular'),
-        email: getValue('email'),
-
-        // Dados do Proprietário
+        enderecoLocatario: getValue('enderecoLocatario'),
         nomeProprietario: getValue('nomeProprietario'),
-        RGProprietario: getValue('RGProprietario'),
-        CPFProprietario: getValue('CPFProprietario'),
-        enderecoProprietario: getValue('enderecoProprietario'),
-        celProprietario: getValue('celProprietario'),
-        emailProprietario: getValue('emailProprietario'),
-
-        // Dados do Imóvel
         tipoDoImovel: getValue('tipoDoImovel'),
-        enderecoImovel: getValue('EnderecoImovel'),
-        CEPImovel: getValue('CEPImovel'),
-        cidadeImovel: getValue('CidadeImovel'),
+        enderecoImovel: getValue('enderecoImovel'),
         caracteristicasImovel: getValue('caracteristicasImovel'),
-
-        // Serviços
         matriculaCopasa: getValue('matriculaCopasa'),
         hidrometroCopasa: getValue('hidrometroCopasa'),
         CemigInstalacao: getValue('CemigInstalacao'),
-        numeroMedidor: getValue('medidor'),
-        IPTUimovel: getValue('IPTUimovel'),
-        InscricaoIPTU: getValue('inscricaoIPTU'),
-
-        // Duração do Contrato
+        numeroMedidor: getValue('numeroMedidor'),
+        IPTUImovel: getValue('IPTUImovel'),
+        InscricaoIPTU: getValue('InscricaoIPTU'),
         duracao: getValue('duracao'),
         dataInicio: getValue('dataInicio'),
         dataTermino: getValue('dataTermino'),
-        valorLocacaoMensal: getValue('ValorLocacaoMensal'),
-        mesDeDesocupacao: getValue('mesDeDesocupacao'),
+        valorLocacaoMensal: getValue('valorLocacaoMensal'),
         dataContrato: getValue('dataContrato'),
-
-        // Fiadores - COM OS NOMES QUE ESTÃO NO TEMPLATE
         fiadores: []
     };
 
-    // Coletar fiadores com os nomes corretos para o template
+    // Coletar fiadores
     for (let i = 1; i < fiadoresCount; i++) {
         const nomeFiador = getValue(`fiadorNome${i}`);
         
-        // Só adiciona fiador se tiver nome
         if (nomeFiador && nomeFiador.trim() !== "") {
             const fiadorObj = {
-                nomeFiador: nomeFiador, // ← Nome que está no template
-                RGFiador: getValue(`fiadorRG${i}`) || "", // ← Nome que está no template
-                CPFFiador: getValue(`fiadorCPF${i}`) || "", // ← Nome que está no template
-                enderecoFiador: getValue(`fiadorEndereco${i}`) || "", // ← Nome que está no template
-                celularFiador: getValue(`fiadorCelular${i}`) || "", // ← Nome que está no template
-                emailFiador: getValue(`fiadorEmail${i}`) || "", // ← Nome que está no template
+                nomeFiador: nomeFiador,
+                nacionalidadeFiador: getValue(`fiadorNacionalidade${i}`) || "Brasileira",
+                estadoCivilFiador: getValue(`fiadorEstadoCivil${i}`) || "",
+                profissaoFiador: getValue(`fiadorProfissao${i}`) || "",
+                RGFiador: getValue(`fiadorRG${i}`) || "",
+                CPFFiador: getValue(`fiadorCPF${i}`) || "",
+                enderecoFiador: getValue(`fiadorEndereco${i}`) || "",
             };
             
             dados.fiadores.push(fiadorObj);
-            
-            console.log(`✅ Fiador ${i} com nomes corretos:`, fiadorObj);
         }
     }
-
-    console.log('📦 Dados completos para envio:', {
-        nomeLocatario: dados.nomeLocatario,
-        totalFiadores: dados.fiadores.length,
-        fiadores: dados.fiadores
-    });
 
     return dados;
-
-
-    }  
-
-
-// FUNÇÃO PARA VALIDAR DADOS
-function validarDados(dados) {
-    const camposObrigatorios = [
-        'nomeLocatario', 'RG', 'cpf_locatario', 'endereco', 'valorLocacao',
-        'nomeProprietario', 'tipoDoImovel', 'EnderecoImovel',
-        'duracao', 'dataInicio', 'dataTermino', 'ValorLocacaoMensal'
-    ];
-
-    for (const campo of camposObrigatorios) {
-        if (!dados[campo] || dados[campo].trim() === "") {
-            console.error(`Campo obrigatório não preenchido: ${campo}`);
-            return false;
-        }
-    }
-
-    return true;
 }
 
 // CARREGAR DADOS DO PIPEFY
@@ -612,66 +564,62 @@ function getPipefyFieldMappingsLocacao() {
     return {
         // Dados do Locatário
         'nomeLocatario': 'nomeLocatario',
-        'CPFLocatario': 'CPFLocatario', 
-        'RGLocatario' :'RGLocatario' ,
-        'email': 'email',
-        'celular': 'celular',
-        'enderecoImovel': 'EnderecoImovel', 
+        'RGLocatario': 'RGLocatario',
+        'CPFLocatario': 'CPFLocatario',
+        'nacionalidadeLocatario': 'nacionalidadeLocatario',
+        'estadoCivilLocatario': 'estadoCivilLocatario',
+        'profissaoLocatario': 'profissaoLocatario',
+        'enderecoLocatario': 'enderecoLocatario',
         
         // Dados do Proprietário
         'nomeProprietario': 'nomeProprietario',
-        'RGProprietario': 'RGProprietario',
-        'CPFProprietario': 'CPFProprietario', 
-        'enderecoProprietario': 'enderecoProprietario',
-        'celProprietario': 'celProprietario',
-        'emailProprietario': 'emailProprietario',
         
-        // Dados Bancários
-        'banco': 'banco',
-        'agencia': 'agencia',
-        'conta': 'conta',
-        'pix': 'pix',
+        // Dados do Imóvel
+        'tipoDoImovel': 'tipoDoImovel',
+        'enderecoImovel': 'enderecoImovel',
+        'caracteristicasImovel': 'caracteristicasImovel',
         
-        // Serviços
-        'CemigInstalacao': 'CemigInstalacao', 
+        // Serviços e Tributos
         'matriculaCopasa': 'matriculaCopasa',
-        'hidrometro': 'hidrometroCopasa', 
-        'numeroMedidor': 'medidor', 
-        'iptu': 'IPTUimovel',
-        'inscricao_iptu': 'InscricaoIPTU',
+        'hidrometroCopasa': 'hidrometroCopasa',
+        'CemigInstalacao': 'CemigInstalacao',
+        'numeroMedidor': 'numeroMedidor',
+        'IPTUImovel': 'IPTUImovel',
+        'InscricaoIPTU': 'InscricaoIPTU',
         
+        // Duração do Contrato
+        'duracao': 'duracao',
+        'dataInicio': 'dataInicio',
+        'dataTermino': 'dataTermino',
+        'valorLocacaoMensal': 'valorLocacaoMensal',
+        'dataContrato': 'dataContrato'
     };
 }
 
-// SUBSTITUA A FUNÇÃO fillContratoFormWithCardData POR ESTA:
+// FUNÇÃO PARA PREENCHER FORMULÁRIO
 function fillContratoFormWithCardData(cardData) {
     console.log('🎯 Preenchendo contrato locação com dados do Pipefy...');
     
     const dados = cardData.dadosPreenchidos;
-    const mappings = getPipefyFieldMappingsLocacao(); // USE O MAPEAMENTO
+    const mappings = getPipefyFieldMappingsLocacao();
     let camposPreenchidos = 0;
 
-    // Preenchimento por mapeamento personalizado E direto
-    Object.keys(dados).forEach(campoPipefy => {
+    Object.keys(mappings).forEach(campoPipefy => {
+        const campoFormulario = mappings[campoPipefy];
         const valor = dados[campoPipefy];
         
-        // 1. Tentar preencher pelo mapeamento personalizado
-        const campoFormulario = mappings[campoPipefy];
-        if (campoFormulario) {
+        if (valor && valor !== "" && valor !== "undefined" && valor !== "null") {
             const input = document.getElementById(campoFormulario);
-            if (input && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
+            if (input) {
                 input.value = valor;
                 camposPreenchidos++;
-                console.log(`✅ ${campoPipefy} -> ${campoFormulario}: ${valor}`);
+                
+                // Feedback visual
+                input.style.backgroundColor = '#e8f5e8';
+                setTimeout(() => { 
+                    input.style.backgroundColor = ''; 
+                }, 2000);
             }
-        }
-        
-        // 2. Também tentar preenchimento direto (para compatibilidade)
-        const inputDireto = document.getElementById(campoPipefy);
-        if (inputDireto && valor && valor !== "" && valor !== "undefined" && valor !== "null") {
-            inputDireto.value = valor;
-            camposPreenchidos++;
-            console.log(`✅ ${campoPipefy}: ${valor}`);
         }
     });
 
