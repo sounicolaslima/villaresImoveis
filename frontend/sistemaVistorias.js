@@ -1,25 +1,28 @@
 //===============================================================
-// SISTEMA DE VISTORIAS - VILLARES IMÓVEIS - ATUALIZADO
+// SISTEMA DE VISTORIAS - CORREÇÕES ESPECÍFICAS
 //===============================================================
 
 let vistorias = JSON.parse(localStorage.getItem('vistorias_villares')) || [];
-let fotosParaUpload = [];
 let fotosSelecionadas = [];
+let uploadEmAndamento = false;
 
-// FUNÇÃO PARA FORMATAR DATA
+// FUNÇÕES BÁSICAS
 function formatarData(dataString) {
     return new Date(dataString).toLocaleDateString('pt-BR');
 }
 
-// FUNÇÃO PRINCIPAL PARA CARREGAR A PÁGINA DE VISTORIAS
-async function loadVistoriasPage() {
-    console.log('Carregando página de vistorias Villares...');
-
-    const content = document.getElementById('page-content');
-    if (!content) {
-        console.error('Elemento page-content não encontrado!');
-        return;
+function showAlert(message, type = 'info') {
+    if (window.app && window.app.showAlert) {
+        window.app.showAlert(message, type);
+    } else {
+        alert(message);
     }
+}
+
+// CARREGAR PÁGINA PRINCIPAL
+function loadVistoriasPage() {
+    const content = document.getElementById('page-content');
+    if (!content) return;
 
     content.innerHTML = `
         <div class="page-container">
@@ -29,10 +32,7 @@ async function loadVistoriasPage() {
             </div>
 
             <div class="main-container">
-                <div id="loading" class="alert alert-info">Carregando...</div>
-
                 <form id="vistoria-form">
-                    <!-- Dados da Vistoria -->
                     <div class="section-header">
                         <h3>DADOS DA VISTORIA</h3>
                     </div>
@@ -41,66 +41,59 @@ async function loadVistoriasPage() {
                         <div class="col-6">
                             <div class="form-group">
                                 <label>Endereço do Imóvel</label>
-                                <input type="text" id="enderecoVistoria" class="form-control" placeholder="Endereço completo do imóvel" required>
+                                <input type="text" id="enderecoVistoria" class="form-control" placeholder="Endereço completo" required>
                             </div>
                         </div>
                         <div class="col-3">
                             <div class="form-group">
-                                <label>Data da Vistoria</label>
+                                <label>Data</label>
                                 <input type="date" id="dataVistoria" class="form-control" value="${new Date().toISOString().split('T')[0]}" required>
                             </div>
                         </div>
                         <div class="col-3">
                             <div class="form-group">
                                 <label>Vistoriador</label>
-                                <input type="text" id="vistoriador" class="form-control" placeholder="Nome do vistoriador" required>
+                                <input type="text" id="vistoriador" class="form-control" placeholder="Nome" required>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Observações</label>
-                        <textarea id="observacoesVistoria" class="form-control" rows="3" placeholder="Observações sobre a vistoria..."></textarea>
+                        <textarea id="observacoesVistoria" class="form-control" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <!-- Upload de Fotos -->
                     <div class="section-header">
-                        <h3>FOTOS DA VISTORIA</h3>
-                        <div id="fotos-count" class="badge badge-primary" style="display: none;">0 fotos selecionadas</div>
+                        <h3>FOTOS <span id="fotos-count" class="badge badge-primary" style="display: none;">0</span></h3>
                     </div>
 
                     <div class="form-group">
-                        <div class="upload-section">
-                            <div class="upload-area" id="upload-area" style="position: relative; overflow: hidden;">
-                                <div class="upload-content">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <p>Arraste e solte as fotos aqui</p>
-                                    <small>ou clique para selecionar</small>
-                                    <small class="text-muted">Formatos: JPG, PNG, GIF (Máx. 5MB por foto)</small>
-                                </div>
-                                <input type="file" id="fotosInput" multiple accept="image/*" style="position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; top: 0; left: 0; z-index: 10;">
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Clique para selecionar fotos</p>
+                                <small>Arraste ou clique para adicionar</small>
                             </div>
-                            
-                            <!-- Botão para ver fotos selecionadas -->
-                            <div id="fotos-preview-section" class="mt-3" style="display: none;">
-                                <button type="button" class="btn btn-info btn-block" onclick="visualizarFotosSelecionadas()">
-                                    <i class="fas fa-eye"></i> Ver Fotos Selecionadas (<span id="fotos-count-preview">0</span>)
-                                </button>
-                            </div>
+                            <input type="file" id="fotosInput" multiple accept="image/*" style="position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; top: 0; left: 0;">
                         </div>
-                    </div>
-
-                    <!-- Botão de Salvar -->
-                    <div class="row mt-3">
-                        <div class="col-12 text-center">
-                            <button type="button" class="btn btn-primary btn-block" onclick="salvarVistoria()">
-                                💾 SALVAR VISTORIA
+                        
+                        <div id="fotos-preview-section" class="mt-2" style="display: none;">
+                            <button type="button" class="btn btn-info btn-sm" onclick="visualizarFotosSelecionadas()">
+                                👁️ Ver Fotos (<span id="fotos-count-preview">0</span>)
+                            </button>
+                            <button type="button" class="btn btn-warning btn-sm ml-2" onclick="limparFotosSelecionadas()">
+                                🗑️ Limpar
                             </button>
                         </div>
                     </div>
+
+                    <div class="text-center mt-3">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="salvarVistoria()">
+                            💾 SALVAR VISTORIA
+                        </button>
+                    </div>
                 </form>
 
-                <!-- Lista de Vistorias Salvas -->
                 <div class="section-header mt-4">
                     <h3>VISTORIAS SALVAS</h3>
                 </div>
@@ -112,23 +105,27 @@ async function loadVistoriasPage() {
         </div>
     `;
 
-    // Configurar eventos de upload
-    configurarUploadVistoria();
+    configurarUpload();
 }
 
-// CONFIGURAR UPLOAD DE FOTOS PARA VISTORIA
-function configurarUploadVistoria() {
+// CONFIGURAR UPLOAD - VERSÃO SIMPLIFICADA
+function configurarUpload() {
     const uploadArea = document.getElementById('upload-area');
     const fotosInput = document.getElementById('fotosInput');
 
     if (!uploadArea || !fotosInput) return;
 
-    // Clique na área de upload
+    // Remove event listeners anteriores
+    const novoFotosInput = fotosInput.cloneNode(true);
+    fotosInput.parentNode.replaceChild(novoFotosInput, fotosInput);
+
+    // Configura novos event listeners
     uploadArea.addEventListener('click', () => {
-        fotosInput.click();
+        if (!uploadEmAndamento) {
+            novoFotosInput.click();
+        }
     });
 
-    // Arrastar e soltar
     uploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadArea.classList.add('dragover');
@@ -141,201 +138,93 @@ function configurarUploadVistoria() {
     uploadArea.addEventListener('drop', (e) => {
         e.preventDefault();
         uploadArea.classList.remove('dragover');
-        processarArquivosVistoria(e.dataTransfer.files);
+        if (!uploadEmAndamento) {
+            processarArquivos(e.dataTransfer.files);
+        }
     });
 
-    // Seleção de arquivos
-    fotosInput.addEventListener('change', (e) => {
-        processarArquivosVistoria(e.target.files);
+    novoFotosInput.addEventListener('change', (e) => {
+        if (!uploadEmAndamento) {
+            processarArquivos(e.target.files);
+        }
     });
 }
 
-// PROCESSAR ARQUIVOS PARA VISTORIA
-function processarArquivosVistoria(files) {
-    if (files.length === 0) return;
+// PROCESSAR ARQUIVOS - CORREÇÃO DO PROBLEMA
+function processarArquivos(files) {
+    if (!files.length) return;
 
-    // Limpar array anterior
+    // LIMPA AS FOTOS ANTERIORES - ESSA É A CORREÇÃO PRINCIPAL
     fotosSelecionadas = [];
 
-    for (let file of files) {
-        if (file.size > 5 * 1024 * 1024) {
-            showAlert(`Arquivo ${file.name} é muito grande. Máximo 5MB.`, 'warning');
-            continue;
-        }
-
+    const arquivosValidos = Array.from(files).filter(file => {
         if (!file.type.startsWith('image/')) {
-            showAlert(`Arquivo ${file.name} não é uma imagem válida.`, 'warning');
-            continue;
+            showAlert(`Arquivo "${file.name}" não é uma imagem!`, 'warning');
+            return false;
         }
+        if (file.size > 10 * 1024 * 1024) {
+            showAlert(`Arquivo "${file.name}" excede 10MB!`, 'warning');
+            return false;
+        }
+        return true;
+    });
 
-        fotosSelecionadas.push(file);
-    }
-
-    if (fotosSelecionadas.length > 0) {
-        // Mostrar contador de fotos
-        const fotosCount = document.getElementById('fotos-count');
-        const fotosCountPreview = document.getElementById('fotos-count-preview');
-        const previewSection = document.getElementById('fotos-preview-section');
+    if (arquivosValidos.length > 0) {
+        // ADICIONA TODOS OS ARQUIVOS VÁLIDOS - CORREÇÃO DO PROBLEMA
+        fotosSelecionadas = [...arquivosValidos];
         
-        fotosCount.textContent = `${fotosSelecionadas.length} foto(s) selecionada(s)`;
-        fotosCount.style.display = 'inline-block';
-        
-        fotosCountPreview.textContent = fotosSelecionadas.length;
-        previewSection.style.display = 'block';
-
-        showAlert(`${fotosSelecionadas.length} foto(s) selecionada(s) com sucesso! Clique em "Ver Fotos Selecionadas" para visualizar.`, 'success');
+        document.getElementById('fotos-count').textContent = fotosSelecionadas.length;
+        document.getElementById('fotos-count').style.display = 'inline-block';
+        document.getElementById('fotos-count-preview').textContent = fotosSelecionadas.length;
+        document.getElementById('fotos-preview-section').style.display = 'block';
+        showAlert(`${fotosSelecionadas.length} foto(s) selecionada(s)!`, 'success');
+    } else {
+        // Se não há arquivos válidos, limpa a seleção
+        limparFotosSelecionadas();
     }
 }
 
-// VISUALIZAR FOTOS SELECIONADAS ANTES DE SALVAR
-function visualizarFotosSelecionadas() {
-    if (fotosSelecionadas.length === 0) {
-        showAlert('Nenhuma foto selecionada!', 'warning');
+// LIMPAR FOTOS SELECIONADAS
+function limparFotosSelecionadas() {
+    fotosSelecionadas = [];
+    document.getElementById('fotosInput').value = '';
+    document.getElementById('fotos-count').style.display = 'none';
+    document.getElementById('fotos-preview-section').style.display = 'none';
+    showAlert('Fotos removidas!', 'info');
+}
+
+// SALVAR VISTORIA - VERSÃO CORRIGIDA
+async function salvarVistoria() {
+    if (uploadEmAndamento) {
+        showAlert('Upload em andamento, aguarde...', 'warning');
         return;
     }
 
-    // Criar página de pré-visualização
-    const paginaPreview = `
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Pré-visualização das Fotos</title>
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    padding: 20px;
-                    background: #f5f5f5;
-                }
-                .header {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin-bottom: 20px;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                    text-align: center;
-                }
-                .fotos-container {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                    gap: 15px;
-                    margin-bottom: 30px;
-                }
-                .foto-item {
-                    background: white;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                    text-align: center;
-                }
-                .foto-item img {
-                    width: 100%;
-                    height: 150px;
-                    object-fit: cover;
-                }
-                .foto-info {
-                    padding: 10px;
-                    font-size: 12px;
-                    color: #666;
-                }
-                .btn-confirmar {
-                    background: #28a745;
-                    color: white;
-                    border: none;
-                    padding: 15px 30px;
-                    border-radius: 6px;
-                    font-size: 16px;
-                    cursor: pointer;
-                    margin: 10px;
-                }
-                .btn-voltar {
-                    background: #6c757d;
-                    color: white;
-                    border: none;
-                    padding: 15px 30px;
-                    border-radius: 6px;
-                    font-size: 16px;
-                    cursor: pointer;
-                    margin: 10px;
-                }
-                .botoes-container {
-                    text-align: center;
-                    margin-top: 20px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1><i class="fas fa-images"></i> Pré-visualização das Fotos</h1>
-                <p><strong>Total de fotos:</strong> ${fotosSelecionadas.length}</p>
-                <p>Confirme se todas as fotos estão corretas antes de salvar a vistoria.</p>
-            </div>
-
-            <div class="fotos-container">
-                ${fotosSelecionadas.map((foto, index) => {
-                    const url = URL.createObjectURL(foto);
-                    return `
-                        <div class="foto-item">
-                            <img src="${url}" alt="Foto ${index + 1}">
-                            <div class="foto-info">
-                                <strong>Foto ${index + 1}</strong><br>
-                                ${foto.name}<br>
-                                ${(foto.size / 1024 / 1024).toFixed(2)} MB
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-
-            <div class="botoes-container">
-                <button class="btn-confirmar" onclick="confirmarFotos()">
-                    <i class="fas fa-check"></i> Confirmar Fotos
-                </button>
-                <button class="btn-voltar" onclick="window.close()">
-                    <i class="fas fa-times"></i> Fechar
-                </button>
-            </div>
-
-            <script>
-                function confirmarFotos() {
-                    // Fechar a janela e continuar no formulário
-                    window.close();
-                }
-            </script>
-        </body>
-        </html>
-    `;
-
-    // Abrir nova janela
-    const novaJanela = window.open('', '_blank', 'width=1000,height=700,scrollbars=yes');
-    novaJanela.document.write(paginaPreview);
-    novaJanela.document.close();
-}
-
-// SALVAR VISTORIA
-async function salvarVistoria() {
-    const endereco = document.getElementById('enderecoVistoria').value;
+    const endereco = document.getElementById('enderecoVistoria').value.trim();
     const data = document.getElementById('dataVistoria').value;
-    const vistoriador = document.getElementById('vistoriador').value;
-    const observacoes = document.getElementById('observacoesVistoria').value;
+    const vistoriador = document.getElementById('vistoriador').value.trim();
+    const observacoes = document.getElementById('observacoesVistoria').value.trim();
 
     if (!endereco || !data || !vistoriador) {
-        showAlert('Por favor, preencha todos os campos obrigatórios!', 'warning');
+        showAlert('Preencha todos os campos obrigatórios!', 'warning');
         return;
     }
 
-    if (fotosSelecionadas.length === 0) {
-        showAlert('Por favor, adicione pelo menos uma foto!', 'warning');
+    if (!fotosSelecionadas.length) {
+        showAlert('Adicione pelo menos uma foto!', 'warning');
         return;
     }
 
-    showAlert('Salvando vistoria e fazendo upload das fotos...', 'info');
+    uploadEmAndamento = true;
+    const btnSalvar = document.querySelector('.btn-primary');
+    const textoOriginal = btnSalvar.innerHTML;
+    btnSalvar.innerHTML = '⏳ SALVANDO...';
+    btnSalvar.disabled = true;
 
     try {
-        // Fazer upload das fotos para Cloudinary
-        const fotosUrls = await uploadFotosParaCloudinary();
+        showAlert('Iniciando upload das fotos...', 'info');
+        
+        const fotosUrls = await uploadParaCloudinary();
 
         const vistoria = {
             id: Date.now().toString(),
@@ -350,39 +239,43 @@ async function salvarVistoria() {
         vistorias.unshift(vistoria);
         localStorage.setItem('vistorias_villares', JSON.stringify(vistorias));
 
-        showAlert('Vistoria salva com sucesso!', 'success');
-        
-        // Limpar formulário
-        limparFormularioVistoria();
-        
-        // Atualizar lista
+        showAlert('✅ Vistoria salva com sucesso!', 'success');
+        limparFormulario();
         document.getElementById('lista-vistorias').innerHTML = renderizarListaVistorias();
 
     } catch (error) {
         console.error('Erro ao salvar vistoria:', error);
-        showAlert('Erro ao salvar vistoria: ' + error.message, 'error');
+        showAlert('❌ Erro ao salvar: ' + error.message, 'error');
+    } finally {
+        uploadEmAndamento = false;
+        btnSalvar.innerHTML = textoOriginal;
+        btnSalvar.disabled = false;
     }
 }
 
-// UPLOAD PARA CLOUDINARY
-async function uploadFotosParaCloudinary() {
-    if (fotosSelecionadas.length === 0) return [];
-
+// UPLOAD CLOUDINARY - VERSÃO SIMPLIFICADA
+async function uploadParaCloudinary() {
     const urls = [];
     
-    for (let file of fotosSelecionadas) {
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', 'villares_vistorias');
-            formData.append('cloud_name', 'da5gy1gds');
+    for (let i = 0; i < fotosSelecionadas.length; i++) {
+        const file = fotosSelecionadas[i];
+        
+        showAlert(`Enviando foto ${i + 1} de ${fotosSelecionadas.length}...`, 'info');
 
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'villares_vistorias');
+        formData.append('cloud_name', 'da5gy1gds');
+
+        try {
             const response = await fetch('https://api.cloudinary.com/v1_1/da5gy1gds/image/upload', {
                 method: 'POST',
                 body: formData
             });
 
-            if (!response.ok) throw new Error(`Erro no upload: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Upload falhou: ${response.status}`);
+            }
 
             const data = await response.json();
             urls.push({
@@ -392,92 +285,47 @@ async function uploadFotosParaCloudinary() {
             });
 
         } catch (error) {
-            console.error('Erro no upload da foto:', error);
-            throw new Error(`Falha no upload da foto ${file.name}`);
+            console.error(`Erro no upload da foto ${file.name}:`, error);
+            throw new Error(`Falha no upload de ${file.name}. Tente novamente.`);
         }
     }
 
     return urls;
 }
 
-// LIMPAR FORMULÁRIO APÓS SALVAR
-function limparFormularioVistoria() {
+// LIMPAR FORMULÁRIO
+function limparFormulario() {
     document.getElementById('vistoria-form').reset();
-    fotosSelecionadas = [];
-    
-    // Limpar indicadores de fotos
-    const fotosCount = document.getElementById('fotos-count');
-    const previewSection = document.getElementById('fotos-preview-section');
-    
-    fotosCount.style.display = 'none';
-    previewSection.style.display = 'none';
+    limparFotosSelecionadas();
 }
 
-// RENDERIZAR LISTA DE VISTORIAS SIMPLIFICADA COM PESQUISA
+// RENDERIZAR LISTA - GARANTIR QUE AS FUNÇÕES ESTEJAM ACESSÍVEIS
 function renderizarListaVistorias() {
-    if (vistorias.length === 0) {
-        return `
-            <div class="alert alert-info text-center">
-                <i class="fas fa-camera fa-2x mb-2"></i>
-                <p>Nenhuma vistoria cadastrada</p>
-                <small>Adicione fotos para criar sua primeira vistoria</small>
-            </div>
-        `;
+    if (!vistorias.length) {
+        return `<div class="alert alert-info text-center">Nenhuma vistoria cadastrada</div>`;
     }
 
     return `
-        <!-- Barra de Pesquisa -->
         <div class="search-bar mb-3">
-            <div class="input-group">
-                <input type="text" id="search-vistorias" class="form-control" 
-                       placeholder="🔍 Pesquisar por endereço, vistoriador..." 
-                       onkeyup="filtrarVistorias()">
-                <button class="btn btn-outline-secondary" type="button" onclick="filtrarVistorias()">
-                    <i class="fas fa-search"></i>
-                </button>
-                <button class="btn btn-outline-secondary" type="button" onclick="limparPesquisa()" title="Limpar pesquisa">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+            <input type="text" id="search-vistorias" class="form-control" placeholder="🔍 Pesquisar..." onkeyup="filtrarVistorias()">
         </div>
-
-        <!-- Contador de resultados -->
-        <div class="search-info mb-2">
-            <small class="text-muted" id="search-count">
-                Mostrando ${vistorias.length} vistoria(s)
-            </small>
-        </div>
-
-        <!-- Lista de Vistorias -->
         <div id="vistorias-list">
-            ${vistorias.map(vistoria => `
-                <div class="vistoria-item" 
-                     data-endereco="${vistoria.endereco.toLowerCase()}" 
-                     data-vistoriador="${vistoria.vistoriador.toLowerCase()}">
+            ${vistorias.map(v => `
+                <div class="vistoria-item" data-endereco="${v.endereco.toLowerCase()}" data-vistoriador="${v.vistoriador.toLowerCase()}">
                     <div class="vistoria-item-header">
                         <div class="vistoria-item-info">
-                            <h5 class="vistoria-endereco">${vistoria.endereco}</h5>
+                            <h5>${v.endereco}</h5>
                             <div class="vistoria-meta">
-                                <span class="vistoria-data"><i class="fas fa-calendar"></i> ${formatarData(vistoria.data)}</span>
-                                <span class="vistoria-vistoriador"><i class="fas fa-user"></i> ${vistoria.vistoriador}</span>
-                                <span class="vistoria-fotos-count"><i class="fas fa-images"></i> ${vistoria.fotos.length} foto(s)</span>
+                                <span>📅 ${formatarData(v.data)}</span>
+                                <span>👤 ${v.vistoriador}</span>
+                                <span>📸 ${v.fotos.length} foto(s)</span>
                             </div>
-                            ${vistoria.observacoes ? `
-                                <div class="vistoria-observacoes">
-                                    <strong>Observações:</strong> ${vistoria.observacoes}
-                                </div>
-                            ` : ''}
+                            ${v.observacoes ? `<div class="vistoria-observacoes">${v.observacoes}</div>` : ''}
                         </div>
                         <div class="vistoria-item-actions">
-                            <button class="btn btn-primary btn-sm" onclick="visualizarVistoria('${vistoria.id}')" title="Ver fotos">
-                                <i class="fas fa-eye"></i> Ver Fotos
-                            </button>
-                            <button class="btn btn-success btn-sm" onclick="baixarTodasFotos('${vistoria.id}')" title="Baixar todas as fotos">
-                                <i class="fas fa-download"></i> Baixar Vistoria
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="excluirVistoria('${vistoria.id}')" title="Excluir vistoria">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="visualizarVistoriaCompleta('${v.id}')">👁️ Ver</button>
+                            <button class="btn btn-success btn-sm" onclick="baixarTodasFotos('${v.id}')">📥 Baixar</button>
+                            <button class="btn btn-danger btn-sm" onclick="excluirVistoriaCompleta('${v.id}')">🗑️</button>
                         </div>
                     </div>
                 </div>
@@ -486,172 +334,385 @@ function renderizarListaVistorias() {
     `;
 }
 
-// FILTRAR VISTORIAS
-function filtrarVistorias() {
-    const searchTerm = document.getElementById('search-vistorias').value.toLowerCase();
-    const vistoriaItems = document.querySelectorAll('.vistoria-item');
-    let visibleCount = 0;
+// FUNÇÕES PARA OS BOTÕES - GARANTIR QUE ESTEJAM NO ESCOPO GLOBAL
 
-    vistoriaItems.forEach(item => {
-        const endereco = item.getAttribute('data-endereco');
-        const vistoriador = item.getAttribute('data-vistoriador');
-        
-        const matches = endereco.includes(searchTerm) || 
-                       vistoriador.includes(searchTerm);
-        
-        item.style.display = matches ? 'block' : 'none';
-        if (matches) visibleCount++;
-    });
-
-    // Atualizar contador
-    const searchCount = document.getElementById('search-count');
-    if (searchCount) {
-        searchCount.textContent = `Mostrando ${visibleCount} vistoria(s)${searchTerm ? ` para "${searchTerm}"` : ''}`;
-    }
-}
-
-// LIMPAR PESQUISA
-function limparPesquisa() {
-    document.getElementById('search-vistorias').value = '';
-    filtrarVistorias();
-}
-
-// BAIXAR TODAS AS FOTOS DA VISTORIA
-async function baixarTodasFotos(vistoriaId) {
+// VISUALIZAR VISTORIA COMPLETA
+function visualizarVistoriaCompleta(vistoriaId) {
     const vistoria = vistorias.find(v => v.id === vistoriaId);
-    if (!vistoria || vistoria.fotos.length === 0) {
-        showAlert('Nenhuma foto encontrada para download!', 'warning');
+    if (!vistoria) {
+        showAlert('Vistoria não encontrada!', 'error');
         return;
     }
 
-    showAlert(`Iniciando download de ${vistoria.fotos.length} fotos...`, 'info');
+    const fotosHTML = vistoria.fotos.map((foto, index) => `
+        <div class="foto-modal-item">
+            <img src="${foto.url}" alt="Foto ${index + 1}" style="width: 100%; height: 200px; object-fit: cover;">
+            <div class="foto-info" style="padding: 10px; font-size: 12px; color: #666;">
+                ${foto.nome || `Foto ${index + 1}`}
+            </div>
+        </div>
+    `).join('');
 
-    try {
-        // Baixar cada foto sequencialmente
-        for (let i = 0; i < vistoria.fotos.length; i++) {
-            const foto = vistoria.fotos[i];
-            
-            // Criar link de download para cada foto
-            const a = document.createElement('a');
-            a.href = foto.url;
-            a.download = `vistoria_${vistoria.endereco.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_')}_${i + 1}.jpg`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            
-            // Pequena pausa entre os downloads para não sobrecarregar
-            if (i < vistoria.fotos.length - 1) {
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-        }
-        
-        showAlert(`Download concluído! ${vistoria.fotos.length} fotos baixadas.`, 'success');
-        
-    } catch (error) {
-        console.error('Erro no download das fotos:', error);
-        showAlert('Erro ao baixar as fotos. Tente novamente.', 'error');
-    }
-}
-
-// VISUALIZAR VISTORIA EM NOVA PÁGINA SIMPLES
-function visualizarVistoria(vistoriaId) {
-    const vistoria = vistorias.find(v => v.id === vistoriaId);
-    if (!vistoria) return;
-
-    // Criar página simples com as fotos
-    const paginaFotos = `
-        <!DOCTYPE html>
-        <html lang="pt-BR">
+    const pagina = `
+        <html>
         <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Fotos da Vistoria - ${vistoria.endereco}</title>
+            <title>Fotos - ${vistoria.endereco}</title>
             <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    padding: 20px;
-                    background: #f5f5f5;
+                body { 
+                    font-family: Arial, sans-serif; 
+                    padding: 20px; 
+                    background: #f5f5f5; 
+                    margin: 0; 
                 }
-                .header {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin-bottom: 20px;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                .header { 
+                    background: white; 
+                    padding: 20px; 
+                    border-radius: 10px; 
+                    margin-bottom: 20px; 
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 }
-                .fotos-container {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                    gap: 15px;
+                .fotos-grid { 
+                    display: grid; 
+                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+                    gap: 15px; 
+                    padding: 10px;
                 }
-                .foto-item {
-                    background: white;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                .foto-modal-item { 
+                    background: white; 
+                    border-radius: 8px; 
+                    overflow: hidden; 
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
                 }
-                .foto-item img {
-                    width: 100%;
-                    height: 200px;
-                    object-fit: cover;
-                }
-                .btn-voltar {
-                    background: #6c757d;
-                    color: white;
-                    padding: 10px 20px;
-                    border: none;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    margin-bottom: 15px;
-                }
-                .btn-voltar:hover {
-                    background: #5a6268;
+                .btn-voltar { 
+                    background: #6c757d; 
+                    color: white; 
+                    border: none; 
+                    padding: 10px 20px; 
+                    border-radius: 5px; 
+                    cursor: pointer; 
+                    margin-bottom: 15px; 
                 }
             </style>
         </head>
         <body>
             <button class="btn-voltar" onclick="window.close()">← Fechar</button>
-            
             <div class="header">
-                <h1>📷 Fotos da Vistoria</h1>
-                <p><strong>Endereço:</strong> ${vistoria.endereco}</p>
-                <p><strong>Data:</strong> ${formatarData(vistoria.data)}</p>
-                <p><strong>Vistoriador:</strong> ${vistoria.vistoriador}</p>
-                <p><strong>Total de Fotos:</strong> ${vistoria.fotos.length}</p>
+                <h1>📷 ${vistoria.endereco}</h1>
+                <p>📅 ${formatarData(vistoria.data)} | 👤 ${vistoria.vistoriador} | 📸 ${vistoria.fotos.length} foto(s)</p>
+                ${vistoria.observacoes ? `<p><strong>Observações:</strong> ${vistoria.observacoes}</p>` : ''}
             </div>
-
-            <div class="fotos-container">
-                ${vistoria.fotos.map(foto => `
-                    <div class="foto-item">
-                        <img src="${foto.url}" alt="${foto.nome}">
-                    </div>
-                `).join('')}
-            </div>
+            <div class="fotos-grid">${fotosHTML}</div>
         </body>
         </html>
     `;
 
-    // Abrir nova janela
-    const novaJanela = window.open('', '_blank', 'width=1200,height=800');
-    novaJanela.document.write(paginaFotos);
-    novaJanela.document.close();
+    const janela = window.open('', '_blank', 'width=1200,height=800');
+    janela.document.write(pagina);
+    janela.document.close();
 }
 
-// EXCLUIR VISTORIA
-function excluirVistoria(vistoriaId) {
-    if (!confirm('Tem certeza que deseja excluir esta vistoria? Esta ação não pode ser desfeita.')) return;
+// EXCLUIR VISTORIA COMPLETA
+function excluirVistoriaCompleta(vistoriaId) {
+    if (!confirm('Tem certeza que deseja excluir esta vistoria? Esta ação não pode ser desfeita.')) {
+        return;
+    }
 
-    vistorias = vistorias.filter(v => v.id !== vistoriaId);
+    const vistoriaIndex = vistorias.findIndex(v => v.id === vistoriaId);
+    if (vistoriaIndex === -1) {
+        showAlert('Vistoria não encontrada!', 'error');
+        return;
+    }
+
+    vistorias.splice(vistoriaIndex, 1);
     localStorage.setItem('vistorias_villares', JSON.stringify(vistorias));
+    
+    // Atualiza a lista na interface
     document.getElementById('lista-vistorias').innerHTML = renderizarListaVistorias();
-    showAlert('Vistoria excluída com sucesso!', 'success');
+    
+    showAlert('✅ Vistoria excluída com sucesso!', 'success');
 }
 
-// FUNÇÃO PARA MOSTRAR ALERTAS
-function showAlert(message, type = 'info') {
-    if (window.app && window.app.showAlert) {
-        window.app.showAlert(message, type);
-    } else {
-        alert(message);
+async function baixarTodasFotos(vistoriaId) {
+    const vistoria = vistorias.find(v => v.id === vistoriaId);
+    if (!vistoria || !vistoria.fotos.length) {
+        showAlert('Nenhuma foto encontrada para download!', 'warning');
+        return;
+    }
+
+    showAlert(`🔄 Preparando download de ${vistoria.fotos.length} fotos...`, 'info');
+
+    try {
+        // Criar um ZIP com todas as fotos
+        await baixarFotosComoZip(vistoria);
+        
+    } catch (error) {
+        console.error('Erro durante o download:', error);
+        // Fallback: baixar fotos individualmente se o ZIP falhar
+        await baixarFotosIndividualmente(vistoria);
     }
 }
+
+// BAIXAR FOTOS COMO ZIP (MELHOR OPÇÃO)
+async function baixarFotosComoZip(vistoria) {
+    const JSZip = window.JSZip;
+    
+    if (!JSZip) {
+        // Se JSZip não estiver disponível, usa fallback
+        throw new Error('JSZip não carregado');
+    }
+
+    const zip = new JSZip();
+    const pasta = zip.folder(`vistoria_${vistoria.endereco.replace(/[^a-zA-Z0-9]/g, '_')}`);
+
+    showAlert('📦 Compactando fotos...', 'info');
+
+    // Adicionar cada foto ao ZIP
+    for (let i = 0; i < vistoria.fotos.length; i++) {
+        const foto = vistoria.fotos[i];
+        
+        try {
+            const response = await fetch(foto.url);
+            const blob = await response.blob();
+            
+            // Nome do arquivo sem caracteres especiais
+            const nomeArquivo = `foto_${i + 1}.jpg`;
+            pasta.file(nomeArquivo, blob);
+            
+            showAlert(`Adicionando foto ${i + 1} de ${vistoria.fotos.length}...`, 'info');
+            
+        } catch (error) {
+            console.error(`Erro ao baixar foto ${i + 1}:`, error);
+        }
+    }
+
+    // Gerar o ZIP
+    const zipBlob = await zip.generateAsync({ 
+        type: "blob",
+        compression: "DEFLATE",
+        compressionOptions: { level: 6 }
+    });
+
+    // Criar link de download
+    const url = URL.createObjectURL(zipBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `vistoria_${vistoria.endereco.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().getTime()}.zip`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Limpar URL
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    
+    showAlert('✅ Download do ZIP concluído!', 'success');
+}
+
+// BAIXAR FOTOS INDIVIDUALMENTE (FALLBACK)
+async function baixarFotosIndividualmente(vistoria) {
+    showAlert('📥 Iniciando download individual das fotos...', 'info');
+
+    for (let i = 0; i < vistoria.fotos.length; i++) {
+        const foto = vistoria.fotos[i];
+        
+        try {
+            const response = await fetch(foto.url);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `vistoria_${vistoria.endereco.replace(/[^a-zA-Z0-9]/g, '_')}_foto_${i + 1}.jpg`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Limpar URL
+            setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+            
+            showAlert(`📸 Baixando foto ${i + 1} de ${vistoria.fotos.length}...`, 'info');
+            
+            // Delay entre downloads para não sobrecarregar
+            if (i < vistoria.fotos.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+        } catch (error) {
+            console.error(`Erro ao baixar foto ${i + 1}:`, error);
+            showAlert(`❌ Erro ao baixar foto ${i + 1}`, 'error');
+        }
+    }
+    
+    showAlert('✅ Todos os downloads foram iniciados!', 'success');
+}
+
+// BAIXAR FOTO ÚNICA (PARA QUANDO O USUÁRIO CLICAR EM UMA FOTO ESPECÍFICA)
+async function baixarFotoUnica(urlFoto, nomeFoto, index, totalFotos) {
+    try {
+        const response = await fetch(urlFoto);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = nomeFoto;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Limpar URL
+        setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        
+        showAlert(`✅ Foto ${index} de ${totalFotos} baixada!`, 'success');
+        
+    } catch (error) {
+        console.error('Erro ao baixar foto:', error);
+        showAlert('❌ Erro ao baixar a foto', 'error');
+    }
+}
+
+// ATUALIZAR A FUNÇÃO visualizarVistoriaCompleta PARA INCLUIR BOTÕES DE DOWNLOAD
+function visualizarVistoriaCompleta(vistoriaId) {
+    const vistoria = vistorias.find(v => v.id === vistoriaId);
+    if (!vistoria) {
+        showAlert('Vistoria não encontrada!', 'error');
+        return;
+    }
+
+    const fotosHTML = vistoria.fotos.map((foto, index) => `
+        <div class="foto-modal-item">
+            <img src="${foto.url}" alt="Foto ${index + 1}" style="width: 100%; height: 200px; object-fit: cover;">
+            <div class="foto-info" style="padding: 10px; font-size: 12px; color: #666;">
+                ${foto.nome || `Foto ${index + 1}`}
+                <br>
+                <button onclick="baixarFotoUnica('${foto.url}', 'vistoria_${vistoria.endereco.replace(/[^a-zA-Z0-9]/g, '_')}_foto_${index + 1}.jpg', ${index + 1}, ${vistoria.fotos.length})" 
+                        style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-top: 5px; font-size: 10px;">
+                    📥 Baixar Esta Foto
+                </button>
+            </div>
+        </div>
+    `).join('');
+
+    const pagina = `
+        <html>
+        <head>
+            <title>Fotos - ${vistoria.endereco}</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    padding: 20px; 
+                    background: #f5f5f5; 
+                    margin: 0; 
+                }
+                .header { 
+                    background: white; 
+                    padding: 20px; 
+                    border-radius: 10px; 
+                    margin-bottom: 20px; 
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+                .fotos-grid { 
+                    display: grid; 
+                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+                    gap: 15px; 
+                    padding: 10px;
+                }
+                .foto-modal-item { 
+                    background: white; 
+                    border-radius: 8px; 
+                    overflow: hidden; 
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                }
+                .btn-voltar { 
+                    background: #6c757d; 
+                    color: white; 
+                    border: none; 
+                    padding: 10px 20px; 
+                    border-radius: 5px; 
+                    cursor: pointer; 
+                    margin-bottom: 15px; 
+                }
+                .btn-download-all {
+                    background: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-left: 10px;
+                }
+            </style>
+        </head>
+        <body>
+            <div>
+                <button class="btn-voltar" onclick="window.close()">← Fechar</button>
+                <button class="btn-download-all" onclick="window.opener.baixarTodasFotos('${vistoriaId}')">📥 Baixar Todas as Fotos</button>
+            </div>
+            <div class="header">
+                <h1>📷 ${vistoria.endereco}</h1>
+                <p>📅 ${formatarData(vistoria.data)} | 👤 ${vistoria.vistoriador} | 📸 ${vistoria.fotos.length} foto(s)</p>
+                ${vistoria.observacoes ? `<p><strong>Observações:</strong> ${vistoria.observacoes}</p>` : ''}
+            </div>
+            <div class="fotos-grid">${fotosHTML}</div>
+            
+            <script>
+                function baixarFotoUnica(urlFoto, nomeFoto, index, totalFotos) {
+                    fetch(urlFoto)
+                        .then(response => response.blob())
+                        .then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = nomeFoto;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+                            alert('✅ Foto ' + index + ' de ' + totalFotos + ' baixada!');
+                        })
+                        .catch(error => {
+                            console.error('Erro ao baixar foto:', error);
+                            alert('❌ Erro ao baixar a foto');
+                        });
+                }
+            </script>
+        </body>
+        </html>
+    `;
+
+    const janela = window.open('', '_blank', 'width=1200,height=800');
+    janela.document.write(pagina);
+    janela.document.close();
+}
+
+// ADICIONAR JSZip AO SEU HTML (necessário para o ZIP)
+function carregarJSZip() {
+    if (!window.JSZip) {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+        script.integrity = 'sha512-XMVd28F1oH/O71fzwBnV7HucLxVWTq3Z4Y5nZ5OMr6Gx5Rk6RZgCrkQl3pDGhGdhCJqxzkYy1R1xrR6Q0VvTyw==';
+        script.crossOrigin = 'anonymous';
+        script.referrerPolicy = 'no-referrer';
+        document.head.appendChild(script);
+        
+        script.onload = () => {
+            console.log('JSZip carregado com sucesso!');
+        };
+        
+        script.onerror = () => {
+            console.log('Erro ao carregar JSZip, usando fallback...');
+        };
+    }
+}
+
+// Carregar JSZip quando a página carregar
+document.addEventListener('DOMContentLoaded', carregarJSZip);
+
+// GARANTIR QUE AS NOVAS FUNÇÕES ESTEJAM DISPONÍVEIS
+window.baixarTodasFotos = baixarTodasFotos;
+window.baixarFotosComoZip = baixarFotosComoZip;
+window.baixarFotosIndividualmente = baixarFotosIndividualmente;
+window.baixarFotoUnica = baixarFotoUnica;
+window.carregarJSZip = carregarJSZip;
