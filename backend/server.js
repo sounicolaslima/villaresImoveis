@@ -121,6 +121,18 @@ app.get('/api/active-clients', async (req, res) => {
     }
 });
 
+// ROTA PARA O MAPEAMENTO PIPEFY
+app.get('/api/mapeamento-pipefy', (req, res) => {
+    try {
+        // Ajuste o caminho conforme a localização do seu arquivo
+        const MAPEAMENTO_PIPEFY = require('./mapeamento-pipefy.js');
+        res.json(MAPEAMENTO_PIPEFY);
+    } catch (error) {
+        console.error('Erro ao carregar mapeamento:', error);
+        res.status(500).json({ error: 'Erro ao carregar mapeamento' });
+    }
+});
+
 // FUNÇÃO PARA MAPEAR DADOS DO PIPEFY
 function mapearDadosPipefy(cardData) {
     const dadosMapeados = {};
@@ -206,7 +218,7 @@ app.post('/api/mapear-card-pipefy', async (req, res) => {
 // VERSÃO SIMPLES - SE NÃO TEM DADO, FICA VAZIO
     function gerarDocumento(templateName, dados, res, filename) {
         return new Promise((resolve, reject) => {
-        try {
+            try {
             const templatePath = path.join(templatesDir, templateName);
             if (!fs.existsSync(templatePath)) {
                 throw new Error(`Template não encontrado: ${templatePath}`);
@@ -304,6 +316,15 @@ app.post('/api/gerar-documento/gestaodecondominio', async (req, res) => {
     }
 });
 
+app.post('/api/gerar-documento/termoEntregaChaves', async (req, res) => {
+    try {
+        await gerarDocumento('termoEntregaChaves.docx', req.body, res, 'termoEntregaChaves.docx');
+    } catch (error) {
+        console.error('❌ Erro ao gerar termo de entrega de chaves:', error);
+        res.status(500).json({ error: 'Erro ao gerar termo de entrega de chaves' });
+    }
+});
+
 // HEALTH CHECK
 app.get('/health', (req, res) => {
     res.json({
@@ -322,7 +343,8 @@ app.get('/api/verificar-templates', (req, res) => {
         'fichaCadastral.docx': fs.existsSync(path.join(templatesDir, 'fichaCadastral.docx')),
         'recibo.docx': fs.existsSync(path.join(templatesDir, 'recibo.docx')),
         'vistoria_corrigido_dinamico.docx': fs.existsSync(path.join(templatesDir, 'vistoria_corrigido_dinamico.docx')),
-        'condominios.docx': fs.existsSync(path.join(templatesDir, 'condominios.docx'))
+        'condominios.docx': fs.existsSync(path.join(templatesDir, 'condominios.docx')),
+        'termoEntregaChaves.docx': fs.existsSync(path.join(templatesDir, 'termoEntregaChaves.docx'))
     };
     
     res.json({ templates: templates });

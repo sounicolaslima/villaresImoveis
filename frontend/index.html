@@ -120,6 +120,14 @@
                             <div class="card-description">Documentos para gestão condominial</div>
                         </a>
                     </div>
+
+                    <div class="col-4">
+                         <a href="#" class="card-button" onclick="showPage('termoEntregaChaves')">
+                            <div class="card-icon">🔑</div>
+                            <div class="card-title">Termo de Entrega de Chaves</div>
+                            <div class="card-description">Termo para início de locação</div>
+                        </a>
+                    </div>
                     <!-- ADICIONAR: Card do Sistema de Vistorias ao lado do Gestão de Condomínios -->
                     <div class="col-4">
                         <a href="#" onclick="showPage('vistorias')" class="card-button">
@@ -131,16 +139,13 @@
                 </div>
             </div>
             
-            <!-- Os cards de links externos serão adicionados automaticamente pelo JavaScript -->
             
         </div>
 
-        <!-- Conteúdo das Páginas -->
         <div id="page-content"></div>
     </div>
 
     <!-- Incluir todos os scripts -->
-    <script src="app.js"></script>
     <script src="cadastroimovel.js"></script>
     <script src="contratoLocacao.js"></script>
     <script src="contratoAdministracao.js"></script>
@@ -148,8 +153,9 @@
     <script src="reciboAluguel.js"></script>
     <script src="termoVistoria.js"></script>
     <script src="condominio.js"></script>
-    <!-- ADICIONAR: Script do Sistema de Vistorias -->
     <script src="sistemaVistorias.js"></script>
+    <script src="termoEntregaChaves.js"></script>
+    <script src="app.js"></script>
 
     <script>
         // Funções globais necessárias
@@ -163,90 +169,92 @@
             showPage('dashboard');
         }
 
-        // CORREÇÃO: Função showPage com parâmetro event
         function showPage(page, event = null) {
-    const pageContent = document.getElementById('page-content');
-    const dashboard = document.getElementById('dashboard');
-    
-    // Esconder todas as páginas
-    dashboard.style.display = 'none';
-    if (pageContent) pageContent.innerHTML = '';
-    
-    // Atualizar menu ativo
-    document.querySelectorAll('.sidebar-menu a').forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    if (event && event.target) {
-        event.target.classList.add('active');
-    } else {
-        const menuItem = document.querySelector(`.sidebar-menu a[onclick*="${page}"]`);
-        if (menuItem) {
-            menuItem.classList.add('active');
-        }
-    }
-    
-    // Mostrar dashboard ou página específica
-    if (page === 'dashboard') {
-        dashboard.style.display = 'block';
-        if (window.app) {
-            window.app.carregarFraseInternet();
-        }
-    } else if (page === 'vistorias') {
-        if (typeof loadVistoriasPage === 'function') {
-            loadVistoriasPage();
-        } else {
-            console.error('Sistema de vistorias não carregado');
-            pageContent.innerHTML = `
-                <div class="page-container">
-                    <div class="page-header">
-                        <button class="btn btn-secondary" onclick="showPage('dashboard')">← VOLTAR</button>
-                        <h1>📸 SISTEMA DE VISTORIAS</h1>
-                    </div>
-                    <div class="alert alert-danger">
-                        Sistema de vistorias não disponível.
-                    </div>
-                </div>
-            `;
-        }
-    } else {
-        // USAR O pageLoaders DO app.js PARA AS OUTRAS PÁGINAS
-        dashboard.style.display = 'none';
-        
-        // Verificar se existe no pageLoaders do app.js
-        if (window.pageLoaders && window.pageLoaders[page]) {
-            window.pageLoaders[page]();
-        } else {
-            // Fallback para o método antigo
-            switch(page) {
-                case 'cadastro-imovel':
-                    if (typeof loadCadastroImovelPage === 'function') loadCadastroImovelPage();
-                    break;
-                case 'contrato-locacao':
-                    if (typeof loadContratoLocacaoPage === 'function') loadContratoLocacaoPage();
-                    break;
-                case 'contrato-administracao':
-                    if (typeof loadContratoAdministracaoPage === 'function') loadContratoAdministracaoPage();
-                    break;
-                case 'ficha-cadastral':
-                    if (typeof loadFichaCadastralPage === 'function') loadFichaCadastralPage();
-                    break;
-                case 'recibo-aluguel':
-                    if (typeof loadReciboAluguelPage === 'function') loadReciboAluguelPage();
-                    break;
-                case 'termo-vistoria':
-                    if (typeof loadTermoVistoriaPage === 'function') loadTermoVistoriaPage();
-                    break;
-                case 'gestao-condominios':
-                    if (typeof loadRelatorioPage === 'function') loadRelatorioPage();
-                    break;
-                default:
-                    console.log('Página não encontrada:', page);
-                    pageContent.innerHTML = '<div class="alert alert-danger">Página não encontrada</div>';
+            const pageContent = document.getElementById('page-content');
+            const dashboard = document.getElementById('dashboard');
+            
+            // Esconder todas as páginas
+            dashboard.style.display = 'none';
+            if (pageContent) pageContent.innerHTML = '';
+            
+            // Atualizar menu ativo
+            document.querySelectorAll('.sidebar-menu a').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                const menuItem = document.querySelector(`.sidebar-menu a[onclick*="${page}"]`);
+                if (menuItem) {
+                    menuItem.classList.add('active');
+                }
+            }
+            
+            // Mostrar dashboard ou página específica
+            if (page === 'dashboard') {
+                dashboard.style.display = 'block';
+                if (window.app) {
+                    window.app.carregarFraseInternet();
+                }
+            } else if (page === 'vistorias') {
+                if (typeof loadVistoriasPage === 'function') {
+                    loadVistoriasPage();
+                } else {
+                    console.error('Sistema de vistorias não carregado');
+                    pageContent.innerHTML = `
+                        <div class="page-container">
+                            <div class="page-header">
+                                <button class="btn btn-secondary" onclick="showPage('dashboard')">← VOLTAR</button>
+                                <h1>📸 SISTEMA DE VISTORIAS</h1>
+                            </div>
+                            <div class="alert alert-danger">
+                                Sistema de vistorias não disponível.
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                // USAR O pageLoaders DO app.js PARA AS OUTRAS PÁGINAS
+                dashboard.style.display = 'none';
+                
+                // Verificar se existe no pageLoaders do app.js
+                if (window.pageLoaders && window.pageLoaders[page]) {
+                    window.pageLoaders[page]();
+                } else {
+                    // Fallback para o método antigo
+                    switch(page) {
+                        case 'cadastro-imovel':
+                            if (typeof loadCadastroImovelPage === 'function') loadCadastroImovelPage();
+                            break;
+                        case 'contrato-locacao':
+                            if (typeof loadContratoLocacaoPage === 'function') loadContratoLocacaoPage();
+                            break;
+                        case 'contrato-administracao':
+                            if (typeof loadContratoAdministracaoPage === 'function') loadContratoAdministracaoPage();
+                            break;
+                        case 'ficha-cadastral':
+                            if (typeof loadFichaCadastralPage === 'function') loadFichaCadastralPage();
+                            break;
+                        case 'recibo-aluguel':
+                            if (typeof loadReciboAluguelPage === 'function') loadReciboAluguelPage();
+                            break;
+                        case 'termo-vistoria':
+                            if (typeof loadTermoVistoriaPage === 'function') loadTermoVistoriaPage();
+                            break;
+                        case 'gestao-condominios':
+                            if (typeof loadRelatorioPage === 'function') loadRelatorioPage();
+                            break;
+                        case 'termoEntregaChaves':
+                            if (typeof loadTermoEntregaChavesPage === 'function') loadTermoEntregaChavesPage();
+                            break;
+                        default:
+                            console.log('Página não encontrada:', page);
+                            pageContent.innerHTML = '<div class="alert alert-danger">Página não encontrada</div>';
+                    }
+                }
             }
         }
-    }
-}
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {

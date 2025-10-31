@@ -472,7 +472,8 @@ function showPage(pageName) {
             'contrato-administracao': () => loadContratoAdministracaoPage(),
             'ficha-cadastral': () => loadFichaCadastralPage(),
             'gestao-condominios': () => loadRelatorioPage(),
-            'vistorias': () => loadVistoriasPage()
+            'vistorias': () => loadVistoriasPage(),
+            'termoEntregaChaves': () => loadTermoEntregaChavesPage()
         };
 
         if (pageLoaders[pageName]) {
