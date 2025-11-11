@@ -70,7 +70,7 @@ async function loadReciboAluguelPage() {
                         <div class="col-4">
                             <div class="form-group">
                                 <label>Data do Recibo:</label>
-                                <input type="text" id="data" class="form-control" placeholder="dd/mm/aaaa">>
+                                <input type="text" id="data" class="form-control" placeholder="dd/mm/aaaa">
                             </div>
                         </div>
                     </div>

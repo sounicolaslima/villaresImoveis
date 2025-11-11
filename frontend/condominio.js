@@ -513,20 +513,36 @@ function calcularTotais() {
     const quantidadeUnidades = parseInt(document.getElementById('quantidadeUnidades').value) || 1;
     const despesaPorUnidade = quantidadeUnidades > 0 ? totalDespesas / quantidadeUnidades : 0;
 
-    // Calcular valor total final
-    const outrosValores = ['valorAluguel', 'valorIPTU', 'valorCondominio'];
-    let totalOutros = 0;
+    // ⭐⭐ NOVO: Preencher automaticamente o valor do condomínio com a despesa por unidade
+    const valorCondominioInput = document.getElementById('valorCondominio');
+    if (valorCondominioInput) {
+        valorCondominioInput.value = despesaPorUnidade.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
 
-    outrosValores.forEach(campo => {
-        const input = document.getElementById(campo);
-        if (!input) return;
-
-        let valor = input.value || '0';
+    // ⭐⭐ MODIFICADO: Calcular valor total final (apenas soma dos três campos)
+    const valorAluguelInput = document.getElementById('valorAluguel');
+    const valorIPTUInput = document.getElementById('valorIPTU');
+    
+    let valorAluguel = 0;
+    let valorIPTU = 0;
+    
+    if (valorAluguelInput) {
+        let valor = valorAluguelInput.value || '0';
         valor = valor.replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
-        totalOutros += parseFloat(valor) || 0;
-    });
+        valorAluguel = parseFloat(valor) || 0;
+    }
+    
+    if (valorIPTUInput) {
+        let valor = valorIPTUInput.value || '0';
+        valor = valor.replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
+        valorIPTU = parseFloat(valor) || 0;
+    }
 
-    const valorTotalFinal = despesaPorUnidade + totalOutros;
+    // Total final = Aluguel + IPTU + Condomínio (que agora é a despesa por unidade)
+    const valorTotalFinal = valorAluguel + valorIPTU + despesaPorUnidade;
 
     // Atualizar campos
     const totalDespesasFormatado = totalDespesas.toLocaleString('pt-BR', {
